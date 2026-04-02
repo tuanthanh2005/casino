@@ -16,6 +16,23 @@
 .hist-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
 .hist-table th { padding:0.6rem 0.75rem; text-align:left; color:var(--text-muted); font-weight:600; border-bottom:1px solid var(--border); }
 .hist-table td { padding:0.65rem 0.75rem; border-bottom:1px solid rgba(255,255,255,0.04); }
+
+@media (max-width: 768px) {
+    .pay-tabs { gap:0.6rem; margin-bottom:1rem; }
+    .pay-tab { padding:0.9rem 0.65rem; border-radius:14px; }
+    .pay-tab .tab-icon { font-size:1.5rem; }
+    .pay-tab .tab-title { font-size:0.9rem; }
+    .pay-tab .tab-sub { font-size:0.72rem; }
+
+    #panel-bank .card,
+    #panel-card .card { max-width:100% !important; }
+
+    #panel-bank .card-body > div[style*="grid-template-columns:repeat(4,1fr)"],
+    #panel-card .card-body > div[style*="grid-template-columns:repeat(4,1fr)"],
+    #panel-card .card-body > div[style*="grid-template-columns:repeat(3,1fr)"] {
+        grid-template-columns:repeat(2,1fr) !important;
+    }
+}
 </style>
 @endpush
 
@@ -27,6 +44,48 @@
         &nbsp;·&nbsp; Thuế rút: <span style="color:#ef4444; font-weight:700">2%</span>
     </p>
 </div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-bottom:1rem">
+    <a href="{{ route('payment.deposit') }}" class="btn btn-outline" style="justify-content:center; font-weight:700">
+        <i class="bi bi-plus-circle"></i> Nạp tiền
+    </a>
+    <a href="{{ route('payment.withdraw') }}" class="btn" style="justify-content:center; background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.45); color:var(--primary); font-weight:800">
+        <i class="bi bi-arrow-up-right-circle"></i> Rút / Đổi
+    </a>
+</div>
+
+{{-- RATE LIMIT BANNER --}}
+@if(!$rate['allowed'])
+<div id="rate-banner" style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.35); border-radius:14px; padding:1.25rem 1.5rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:1rem">
+    <div style="font-size:2rem">⏳</div>
+    <div style="flex:1">
+        <div style="font-weight:700; color:#ef4444; font-size:1rem">Quá giới hạn giao dịch</div>
+        <div style="color:var(--text-muted); font-size:0.85rem; margin-top:0.2rem">
+            Bạn đã giao dịch 5 lần trong 30 phút. Vui lòng chờ:
+        </div>
+    </div>
+    <div style="text-align:center; background:rgba(239,68,68,0.15); border-radius:12px; padding:0.75rem 1.25rem; min-width:100px">
+        <div id="rate-countdown" style="font-size:1.75rem; font-weight:900; color:#ef4444; font-family:monospace">{{ sprintf('%02d:%02d', floor($rate['retry_secs']/60), $rate['retry_secs']%60) }}</div>
+        <div style="font-size:0.7rem; color:var(--text-muted)">còn lại</div>
+    </div>
+</div>
+<script>
+(function(){
+    let s = {{ $rate['retry_secs'] }};
+    const el = document.getElementById('rate-countdown');
+    const iv = setInterval(() => {
+        s--;
+        if (s <= 0) { clearInterval(iv); location.reload(); return; }
+        el.textContent = String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+    }, 1000);
+})();
+</script>
+@else
+<div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:0.75rem 1.25rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.75rem; font-size:0.85rem">
+    <i class="bi bi-shield-check" style="color:#10b981"></i>
+    <span style="color:#10b981; font-weight:600">Còn {{ $rate['remaining'] }}/5 lần giao dịch trong 30 phút này</span>
+</div>
+@endif
 
 {{-- TAB --}}
 <div class="pay-tabs">
@@ -257,6 +316,7 @@ async function submitBank() {
         body: JSON.stringify({ method:'bank_transfer', points:pts, bank_name:bn, bank_account:ba, bank_holder:bh })
     });
     const data = await resp.json();
+    if (data.rate_limit) { showToast(data.message, 'error'); setTimeout(() => location.reload(), 2000); return; }
     showToast(data.message, data.success ? 'success' : 'error');
     if (data.success) setTimeout(() => location.reload(), 2000);
 }
@@ -274,6 +334,7 @@ async function submitCard() {
         body: JSON.stringify({ method:'card', points:pts, card_type:selectedCardType })
     });
     const data = await resp.json();
+    if (data.rate_limit) { showToast(data.message, 'error'); setTimeout(() => location.reload(), 2000); return; }
     showToast(data.message, data.success ? 'success' : 'error');
     if (data.success) setTimeout(() => location.reload(), 2000);
 }

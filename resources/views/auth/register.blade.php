@@ -6,7 +6,7 @@
 <div class="auth-page">
     <div class="auth-box">
         <div class="auth-logo">
-            <h1>₿ CryptoBet</h1>
+            <h1>🌊 AquaHub</h1>
             <p>Tạo tài khoản - Nhận 100 Point khởi đầu miễn phí!</p>
         </div>
 

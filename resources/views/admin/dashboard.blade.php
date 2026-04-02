@@ -5,7 +5,7 @@
 @section('admin-content')
 <div class="page-header">
     <h1>📊 Dashboard</h1>
-    <p>Tổng quan hệ thống CryptoBet</p>
+    <p>Tổng quan hệ thống AquaHub</p>
 </div>
 
 <!-- STATS GRID -->

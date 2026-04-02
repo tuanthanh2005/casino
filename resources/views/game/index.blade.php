@@ -323,28 +323,57 @@
         align-items: start;
     }
 
-    @media (max-width: 1024px) {
-        .game-layout { grid-template-columns: 1fr; }
-        .btc-price { font-size: 2.5rem; }
-    }
+    /* ── MOBILE APP STYLE ── */
+    @media (max-width: 768px) {
+        .game-layout {
+            display: block !important;
+            padding: 0 !important;
+        }
+        
+        .price-section {
+            padding: 1.5rem 1rem !important;
+            margin-bottom: 1rem !important;
+            border-radius: 16px !important;
+        }
+        .btc-price {
+            font-size: 2.2rem !important; /* Fixed overflow */
+            letter-spacing: -1px !important;
+        }
+        .price-meta {
+            gap: 1rem !important;
+            margin-top: 1rem !important;
+        }
+        .price-meta-item .value { font-size: 0.9rem !important; }
 
-    /* USER BET STATUS */
-    .bet-active-banner {
-        background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.05));
-        border: 1px solid rgba(99,102,241,0.3);
-        border-radius: 12px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        .session-section {
+            padding: 1rem !important;
+            margin-bottom: 1rem !important;
+        }
+        .session-timer { font-size: 1.5rem !important; }
+
+        .bet-section {
+            padding: 1rem !important;
+            position: relative !important;
+        }
+        .btn-long-big, .btn-short-big {
+            padding: 1rem 0.5rem !important;
+        }
+        .bet-type-icon { font-size: 1.4rem !important; }
+        .bet-type-sub { display: none; } /* Hide sub-text to keep it clean */
+        
+        .amount-presets { justify-content: center; }
+        
+        .card-header { display: none !important; } /* Replaced by mobile conventions */
+        
+        .desktop-only { display: none !important; }
     }
 </style>
 @endpush
 
 @section('content')
-<div class="game-layout">
-    <!-- LEFT: MAIN GAME -->
+<div class="page-enter">
+    <div class="game-layout">
+        <!-- LEFT: MAIN GAME -->
     <div>
         <!-- BTC Price Display -->
         <div class="price-section">

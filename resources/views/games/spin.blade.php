@@ -94,14 +94,58 @@
     border-color: rgba(245,158,11,0.4);
     transform: scale(1.02);
 }
+
+/* ── MOBILE APP STYLE ── */
+@media (max-width: 768px) {
+    .spin-layout {
+        display: block !important;
+        padding: 0 !important;
+    }
+    
+    .wheel-wrap {
+        padding: 1rem !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    #spin-canvas {
+        width: 300px !important;
+        height: 300px !important;
+    }
+
+    .wheel-pointer { top: 10px !important; font-size: 1.5rem !important; }
+
+    .stats-grid-mobile {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+        margin-top: 1rem !important;
+    }
+    .stats-item-mobile {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 0.75rem;
+        text-align: center;
+    }
+    
+    .desktop-only { display: none !important; }
+    .card-header { display: none !important; }
+    
+    #spin-btn { height: 55px !important; font-size: 1.1rem !important; }
+    .preset-btn { padding: 0.5rem 1rem !important; font-size: 0.9rem !important; }
+}
 </style>
 @endpush
 
 @section('content')
-<div style="margin-bottom:1.5rem">
-    <h1 style="font-size:1.75rem; font-weight:900">🎡 Vòng Quay May Mắn</h1>
-    <p style="color:var(--text-muted); margin-top:0.25rem">Quay để nhân điểm — May mắn sẽ đến với bạn!</p>
-</div>
+<div class="page-enter">
+    <div class="desktop-only" style="margin-bottom:1.5rem">
+        <h1 style="font-size:1.75rem; font-weight:900">🎡 Vòng Quay May Mắn</h1>
+        <p style="color:var(--text-muted); margin-top:0.25rem">Quay để nhân điểm — May mắn sẽ đến với bạn!</p>
+    </div>
 
 <div class="spin-layout">
     <!-- LEFT: WHEEL -->
@@ -190,7 +234,7 @@
         $thisTotal  = $thisMonth->count();
     @endphp
     {{-- STATS THÁNG --}}
-    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin-bottom:1rem">
+    <div class="desktop-only" style="display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin-bottom:1rem">
         @foreach([
             ['label'=>'Ván tháng này', 'val'=> $thisTotal, 'color'=>'#818cf8'],
             ['label'=>'Thắng', 'val'=> $thisWins, 'color'=>'#10b981'],
@@ -203,6 +247,18 @@
             <div style="font-size:1.25rem; font-weight:900; color:{{ $s['color'] }}">{{ $s['val'] }}</div>
         </div>
         @endforeach
+    </div>
+
+    <!-- Mobile Mini Stats -->
+    <div class="stats-grid-mobile @media(min-width:769px){display:none !important}">
+        <div class="stats-item-mobile">
+            <div style="font-size:0.6rem; color:var(--text-muted)">Thắng tháng</div>
+            <div style="font-weight:800; color:#10b981">{{ $thisWins }}</div>
+        </div>
+        <div class="stats-item-mobile">
+            <div style="font-size:0.6rem; color:var(--text-muted)">Win Rate</div>
+            <div style="font-weight:800; color:#f59e0b">{{ ($thisTotal>0 ? round($thisWins/$thisTotal*100,0) : 0) }}%</div>
+        </div>
     </div>
 
     {{-- BẢNG LỊCH SỬ --}}
@@ -424,6 +480,11 @@ function showSpinResult(data) {
     userBalance = parseFloat(data.new_balance.replace(/,/g,''));
     document.getElementById('spin-balance').textContent = data.new_balance + ' PT';
     updateNavBalance(data.new_balance);
+    
+    // Sync with mobile header status bar
+    const mNavBalance = document.getElementById('m-nav-balance');
+    if (mNavBalance) mNavBalance.textContent = data.new_balance.split('.')[0]; // Integer part for clean look
+    
     showToast(data.message, isWin ? 'success' : 'error');
 }
 

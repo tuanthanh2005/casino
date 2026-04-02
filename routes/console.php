@@ -17,3 +17,4 @@ Artisan::command('inspire', function () {
 |
 */
 Schedule::command('game:resolve')->everyMinute();
+Schedule::command('farm:check-crops')->everyMinute();

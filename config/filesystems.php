@@ -47,6 +47,15 @@ return [
             'report' => false,
         ],
 
+        'public_uploads' => [
+            'driver' => 'local',
+            'root' => base_path('../public_html'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/'),
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

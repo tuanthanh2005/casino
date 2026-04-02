@@ -57,8 +57,8 @@ class RewardItemController extends Controller
 
         if ($request->hasFile('image')) {
             // Xóa ảnh cũ nếu có
-            if ($reward->image && file_exists(public_path($reward->image))) {
-                unlink(public_path($reward->image));
+            if ($reward->image) {
+                Storage::disk('public_uploads')->delete($reward->image);
             }
             $validated['image'] = $this->uploadImage($request->file('image'));
         }
@@ -70,8 +70,8 @@ class RewardItemController extends Controller
 
     public function destroy(RewardItem $reward)
     {
-        if ($reward->image && file_exists(public_path($reward->image))) {
-            unlink(public_path($reward->image));
+        if ($reward->image) {
+            Storage::disk('public_uploads')->delete($reward->image);
         }
         $reward->delete();
 
@@ -79,17 +79,12 @@ class RewardItemController extends Controller
     }
 
     /**
-     * Upload image to public/uploads/rewards (không dùng storage)
+     * Upload image to uploads/rewards on hosting disk.
      */
     private function uploadImage($file): string
     {
-        $dir = public_path('uploads/rewards');
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-
         $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $file->move($dir, $filename);
+        Storage::disk('public_uploads')->putFileAs('uploads/rewards', $file, $filename);
 
         return 'uploads/rewards/' . $filename;
     }

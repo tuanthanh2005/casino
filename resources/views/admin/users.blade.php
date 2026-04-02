@@ -60,10 +60,16 @@
                     <td>{{ $user->bets_count }}</td>
                     <td style="color:var(--text-muted)">{{ $user->created_at->format('d/m/Y') }}</td>
                     <td>
-                        <button onclick="openAdjustModal({{ $user->id }}, '{{ addslashes($user->name) }}', {{ $user->balance_point }})"
-                                class="btn btn-sm btn-primary">
-                            <i class="bi bi-coin"></i> Điều chỉnh điểm
-                        </button>
+                        <div style="display:flex; gap:0.5rem">
+                            <button onclick="openAdjustModal({{ $user->id }}, '{{ addslashes($user->name) }}', {{ $user->balance_point }})"
+                                    class="btn btn-sm btn-primary">
+                                <i class="bi bi-coin"></i> Điều chỉnh điểm
+                            </button>
+                            <button onclick="handleResetPassword({{ $user->id }}, '{{ addslashes($user->name) }}')"
+                                    class="btn btn-sm btn-outline" style="color:var(--warning); border-color:rgba(245,158,11,0.3)">
+                                <i class="bi bi-key"></i> Reset mật khẩu
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 @empty
@@ -121,6 +127,27 @@
                 <i class="bi bi-check2"></i> Xác nhận
             </button>
         </div>
+    </div>
+</div>
+
+<!-- Reset Password Result Modal -->
+<div class="modal-overlay" id="reset-modal">
+    <div class="modal-box" style="max-width:380px; text-align:center">
+        <div style="font-size:3rem; margin-bottom:1rem">🔑</div>
+        <div class="modal-title" style="margin-bottom:0.5rem">Reset mật khẩu thành công</div>
+        <p style="color:var(--text-muted); font-size:0.875rem; margin-bottom:1.5rem">
+            Mật khẩu mới của <strong id="reset-user-name">Người dùng</strong> là:
+        </p>
+        
+        <div style="position:relative; margin-bottom:1.5rem">
+            <input type="text" id="new-password-display" class="form-control" readonly 
+                   style="text-align:center; font-family:monospace; font-size:1.2rem; font-weight:700; padding:0.8rem; background:rgba(99,102,241,0.1); border:1px dashed var(--primary); color:var(--primary)">
+            <button onclick="copyPassword()" class="btn btn-sm btn-primary" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); padding:0.4rem 0.6rem">
+                <i class="bi bi-clipboard"></i> Copy
+            </button>
+        </div>
+
+        <button onclick="closeResetModal()" class="btn btn-primary w-100">Đóng</button>
     </div>
 </div>
 @endsection
@@ -185,9 +212,49 @@ async function submitAdjust() {
     btn.innerHTML = '<i class="bi bi-check2"></i> Xác nhận';
 }
 
+// Reset Password Logic
+async function handleResetPassword(userId, name) {
+    if (!confirm(`Bạn có chắc chắn muốn reset mật khẩu cho [${name}] không?\nHệ thống sẽ tạo mật khẩu ngẫu nhiên mới.`)) return;
+
+    try {
+        const resp = await fetch(`/admin/users/${userId}/reset-password`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': CSRF,
+                'Accept': 'application/json',
+            }
+        });
+        const data = await resp.json();
+
+        if (data.success) {
+            document.getElementById('reset-user-name').textContent = name;
+            document.getElementById('new-password-display').value = data.password;
+            document.getElementById('reset-modal').classList.add('active');
+        } else {
+            showToast(data.message, 'error');
+        }
+    } catch (e) {
+        showToast('Lỗi kết nối', 'error');
+    }
+}
+
+function closeResetModal() {
+    document.getElementById('reset-modal').classList.remove('active');
+}
+
+function copyPassword() {
+    const input = document.getElementById('new-password-display');
+    input.select();
+    document.execCommand('copy');
+    showToast('Đã copy mật khẩu vào bộ nhớ tạm!', 'success');
+}
+
 // Close on backdrop
 document.getElementById('adjust-modal').addEventListener('click', function(e) {
     if (e.target === this) closeAdjustModal();
+});
+document.getElementById('reset-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeResetModal();
 });
 </script>
 @endpush

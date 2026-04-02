@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin') | CryptoBet Admin</title>
+    <title>@yield('title', 'Admin') | AquaHub Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --accent: #f59e0b;
+            --primary: #06b6d4;
+            --primary-dark: #0891b2;
+            --accent: #10b981;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -361,7 +361,7 @@
     <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <span>₿ CryptoBet</span>
+            <span>🌊 AquaHub</span>
             <small>Admin Panel <span class="admin-badge">ADMIN</span></small>
         </div>
 
@@ -383,6 +383,16 @@
                 <a href="{{ route('admin.casino') }}" class="{{ request()->routeIs('admin.casino') ? 'active' : '' }}"
                    style="{{ request()->routeIs('admin.casino') ? '' : '' }}">
                     <i class="bi bi-dice-5"></i> 🎰 Casino Stats
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.support.chat') }}" class="{{ request()->routeIs('admin.support.chat*') ? 'active' : '' }}">
+                    <i class="bi bi-chat-square-dots"></i> 💬 Chat khách hàng
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.support.contacts') }}" class="{{ request()->routeIs('admin.support.contacts*') ? 'active' : '' }}">
+                    <i class="bi bi-headset"></i> 📞 Liên hệ hỗ trợ
                 </a>
             </li>
 
@@ -431,8 +441,54 @@
                     @endif
                 </a>
             </li>
+            <li>
+                <a href="{{ route('admin.finance.summary') }}" class="{{ request()->routeIs('admin.finance.summary') ? 'active' : '' }}">
+                    <i class="bi bi-bar-chart-line"></i> Tổng thống kê doanh thu
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.finance.loss') }}" class="{{ request()->routeIs('admin.finance.loss') ? 'active' : '' }}">
+                    <i class="bi bi-graph-down-arrow"></i> Doanh thu lỗ
+                </a>
+            </li>
+            <li class="sidebar-section-title">🌾 Nông Trại</li>
+            <li>
+                <a href="{{ route('admin.farm') }}" class="{{ request()->routeIs('admin.farm') ? 'active' : '' }}">
+                    <i class="bi bi-graph-up"></i> Dashboard Farm
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.farm.seeds') }}" class="{{ request()->routeIs('admin.farm.seeds') ? 'active' : '' }}">
+                    <i class="bi bi-flower1"></i> Quản lý hạt giống
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.farm.transactions') }}" class="{{ request()->routeIs('admin.farm.transactions') ? 'active' : '' }}">
+                    <i class="bi bi-receipt"></i> Lịch sử giao dịch
+                </a>
+            </li>
 
-            <li class="sidebar-section-title">Khác</li>
+            <li class="sidebar-section-title">🛡️ Hỗ Trợ MXH</li>
+            <li>
+                <a href="{{ route('admin.nav.orders') }}" class="{{ request()->routeIs('admin.nav.orders*') ? 'active' : '' }}">
+                    <i class="bi bi-clipboard-check"></i> Đơn Hàng NAV
+                    @php $navPending = \App\Models\NavOrder::where('status', 'paid')->count(); @endphp
+                    @if($navPending > 0)
+                        <span style="margin-left:auto; background:var(--primary); color:white; border-radius:100px; padding:0.1rem 0.5rem; font-size:0.7rem; font-weight:700">{{ $navPending }}</span>
+                    @endif
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.nav.services') }}" class="{{ request()->routeIs('admin.nav.services*') ? 'active' : '' }}">
+                    <i class="bi bi-grid-3x2-gap"></i> Dịch Vụ
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.nav.settings') }}" class="{{ request()->routeIs('admin.nav.settings*') ? 'active' : '' }}">
+                    <i class="bi bi-bank"></i> Cài Đặt TT
+                </a>
+            </li>
+
             <li>
                 <a href="{{ route('home') }}" target="_blank">
                     <i class="bi bi-box-arrow-up-right"></i> Xem trang chính

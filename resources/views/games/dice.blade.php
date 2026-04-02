@@ -116,14 +116,40 @@
 
 .preset-btn{padding:0.4rem 0.85rem;background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;font-size:0.8rem;cursor:pointer;color:var(--text-muted);transition:all 0.15s;font-family:'Inter',sans-serif}
 .preset-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+/* ── MOBILE APP STYLE ── */
+@media (max-width: 768px) {
+    .dice-layout {
+        display: block !important;
+        padding: 0 !important;
+    }
+    .dice-arena {
+        padding: 1rem !important;
+        min-height: 250px !important;
+        background: transparent !important;
+        border: none !important;
+        margin-bottom: 0.5rem !important;
+    }
+    .die {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    .die-total { font-size: 2rem !important; }
+    .bet-type-btns { gap: 0.5rem !important; }
+    .btn-tai, .btn-xiu { padding: 0.75rem 0.5rem !important; font-size: 0.9rem !important; }
+    .desktop-only { display: none !important; }
+    .card-header { display: none !important; }
+    #dice-roll-btn { height: 55px !important; font-size: 1rem !important; }
+}
 </style>
 @endpush
 
 @section('content')
-<div style="margin-bottom:1.5rem">
-    <h1 style="font-size:1.75rem; font-weight:900">🎲 Tài Xỉu</h1>
-    <p style="color:var(--text-muted); margin-top:0.25rem">3 xúc xắc — Tổng ≥ 11 là TÀI, ≤ 10 là XỈU · Thắng x1.95</p>
-</div>
+<div class="page-enter">
+    <div class="desktop-only" style="margin-bottom:1.5rem">
+        <h1 style="font-size:1.75rem; font-weight:900">🎲 Tài Xỉu</h1>
+        <p style="color:var(--text-muted); margin-top:0.25rem">3 xúc xắc — Tổng ≥ 11 là TÀI, ≤ 10 là XỈU · Thắng x1.95</p>
+    </div>
 
 <div class="dice-layout">
     <!-- LEFT: ARENA -->
@@ -217,7 +243,7 @@
         $thisTotal   = $thisMonth->count();
         $thisBet     = $thisMonth->sum('bet_amount');
     @endphp
-    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin-bottom:1rem">
+    <div class="desktop-only" style="display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin-bottom:1rem">
         @foreach([
             ['label'=>'Ván tháng này', 'val'=> $thisTotal, 'color'=>'#818cf8'],
             ['label'=>'Thắng', 'val'=> $thisWins, 'color'=>'#10b981'],
@@ -230,6 +256,18 @@
             <div style="font-size:1.25rem; font-weight:900; color:{{ $s['color'] }}">{{ $s['val'] }}</div>
         </div>
         @endforeach
+    </div>
+
+    <!-- Mobile Mini Stats -->
+    <div class="stats-grid-mobile @media(min-width:769px){display:none !important}" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom:1rem">
+        <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:0.75rem; text-align:center">
+            <div style="font-size:0.6rem; color:var(--text-muted)">Thắng tháng</div>
+            <div style="font-weight:800; color:#10b981">{{ $thisWins }}</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:0.75rem; text-align:center">
+            <div style="font-size:0.6rem; color:var(--text-muted)">Win Rate</div>
+            <div style="font-weight:800; color:#f59e0b">{{ ($thisTotal>0 ? round($thisWins/$thisTotal*100,0) : 0) }}%</div>
+        </div>
     </div>
 
     {{-- BẢNG LỊCH SỬ --}}
@@ -474,6 +512,11 @@ async function rollDice() {
             userBalance = parseFloat(data.new_balance.replace(/,/g,''));
             document.getElementById('dice-balance').textContent = data.new_balance + ' PT';
             updateNavBalance(data.new_balance);
+
+            // Sync with mobile header status bar
+            const mNavBalance = document.getElementById('m-nav-balance');
+            if (mNavBalance) mNavBalance.textContent = data.new_balance.split('.')[0];
+
             showToast(data.message, data.won ? 'success' : 'error');
         }
     } catch (e) {

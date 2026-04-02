@@ -42,7 +42,7 @@
                 <label class="form-label-admin">Hình ảnh</label>
                 @if($reward->image)
                     <div style="margin-bottom:0.75rem">
-                        <img src="{{ asset($reward->image) }}" style="max-width:150px; border-radius:8px; margin-bottom:0.5rem; display:block">
+                        <img src="{{ $reward->image_url }}" style="max-width:150px; border-radius:8px; margin-bottom:0.5rem; display:block">
                         <small style="color:var(--text-muted)">Ảnh hiện tại. Chọn ảnh mới để thay thế.</small>
                     </div>
                 @endif

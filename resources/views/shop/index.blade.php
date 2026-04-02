@@ -166,10 +166,39 @@
             align-items: center;
             gap: 0.5rem;
         }
+    /* ── MOBILE APP STYLE ── */
+    @media (max-width: 768px) {
+        .shop-header { display: none !important; } /* Replaced by status bar */
+        
+        .balance-hero {
+            padding: 1rem !important;
+            border-radius: 12px !important;
+            margin-bottom: 1rem !important;
+        }
+        .balance-hero .amount { font-size: 1.8rem !important; }
+
+        .items-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.75rem !important;
+            margin-bottom: 2rem !important;
+        }
+        .item-card { border-radius: 12px !important; }
+        .item-img-wrap { height: 120px !important; }
+        .item-icon-placeholder { font-size: 2.5rem !important; }
+        .item-body { padding: 0.75rem !important; }
+        .item-name { font-size: 0.85rem !important; margin-bottom: 0.25rem !important; }
+        .item-desc { font-size: 0.7rem !important; min-height: auto !important; margin-bottom: 0.5rem !important; }
+        .item-price { font-size: 1rem !important; }
+        .btn-exchange { width: 100% !important; padding: 0.4rem !important; font-size: 0.75rem !important; margin-top: 0.5rem !important; }
+        .item-footer { display: block !important; }
+
+        .my-requests-section h2 { font-size: 1.1rem !important; }
+    }
     </style>
 @endpush
 
 @section('content')
+<div class="page-enter">
     <!-- Shop Header -->
     <div class="shop-header">
         <h1>🎁 Cửa Hàng Phần Thưởng</h1>
@@ -188,7 +217,7 @@
             <div class="item-card">
                 <div class="item-img-wrap">
                     @if($item->image)
-                        <img class="item-img" src="{{ asset($item->image) }}" alt="{{ $item->name }}">
+                        <img class="item-img" src="{{ $item->image_url }}" alt="{{ $item->name }}">
                     @else
                         <div class="item-icon-placeholder">🎁</div>
                     @endif
@@ -328,6 +357,10 @@
                     userBalance = newBal;
                     document.getElementById('shop-balance').textContent = data.new_balance;
                     updateNavBalance(data.new_balance);
+
+                    // Sync with mobile header status bar
+                    const mNavBalance = document.getElementById('m-nav-balance');
+                    if (mNavBalance) mNavBalance.textContent = data.new_balance.split('.')[0];
 
                     // Reload to update button states
                     setTimeout(() => location.reload(), 1500);

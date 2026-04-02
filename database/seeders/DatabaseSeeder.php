@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         // Tạo Admin
         User::firstOrCreate(
-            ['email' => 'admin@cryptobet.com'],
+            ['email' => 'admin@aquahub.pro'],
             [
                 'name' => 'Admin',
                 'password' => Hash::make('admin123456'),
@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
 
         // Tạo User demo
         User::firstOrCreate(
-            ['email' => 'demo@cryptobet.com'],
+            ['email' => 'demo@aquahub.pro'],
             [
                 'name' => 'Demo User',
                 'password' => Hash::make('demo123456'),
@@ -77,7 +77,7 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->command->info('✅ Seeder hoàn tất!');
-        $this->command->info('Admin: admin@cryptobet.com / admin123456');
-        $this->command->info('Demo: demo@cryptobet.com / demo123456');
+        $this->command->info('Admin: admin@aquahub.pro / admin123456');
+        $this->command->info('Demo: demo@aquahub.pro / demo123456');
     }
 }

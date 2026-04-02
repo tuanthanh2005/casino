@@ -57,7 +57,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('home')->with('success', 'Đăng ký thành công! Chào mừng bạn đến với CryptoBet.');
+        return redirect()->route('home')->with('success', 'Đăng ký thành công! Chào mừng bạn đến với AquaHub.');
     }
 
     public function logout(Request $request)

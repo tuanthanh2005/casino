@@ -13,6 +13,8 @@ use App\Models\User;
 use App\Models\WithdrawalOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 
 class AdminController extends Controller
@@ -86,6 +88,24 @@ class AdminController extends Controller
             'success' => true,
             'message' => "{$action} {$amount} điểm cho {$user->name} thành công.",
             'new_balance' => number_format($user->fresh()->balance_point, 2),
+        ]);
+    }
+
+    /**
+     * Reset mật khẩu cho User ngẫu nhiên
+     */
+    public function resetPassword(User $user)
+    {
+        $newPassword = Str::random(10); // Tạo 10 ký tự ngẫu nhiên
+        
+        $user->update([
+            'password' => Hash::make($newPassword)
+        ]);
+
+        return response()->json([
+            'success'  => true,
+            'message'  => "Đã reset mật khẩu cho {$user->name} thành công!",
+            'password' => $newPassword,
         ]);
     }
 
@@ -254,11 +274,12 @@ class AdminController extends Controller
     }
 
     /**
-     * Casino Stats — Vòng Quay & Tài Xỉu
+     * Casino Stats — Vòng Quay, Tài Xỉu, Kéo Búa Bao
      */
     public function casinoStats()
     {
         $since = now()->subHours(24);
+        $monthStart = now()->startOfMonth();
 
         $buildStats = function (string $game) use ($since) {
             $base       = MiniGameLog::where('game_type', $game)->where('created_at', '>=', $since);
@@ -282,9 +303,10 @@ class AdminController extends Controller
 
         $spinStats = $buildStats('spin');
         $diceStats = $buildStats('dice');
+        $rpsStats = $buildStats('rps');
 
-        $totalGames    = $spinStats['total'] + $diceStats['total'];
-        $houseProfit   = $spinStats['house_profit'] + $diceStats['house_profit'];
+        $totalGames    = $spinStats['total'] + $diceStats['total'] + $rpsStats['total'];
+        $houseProfit   = $spinStats['house_profit'] + $diceStats['house_profit'] + $rpsStats['house_profit'];
         $logsAll       = MiniGameLog::where('created_at', '>=', $since);
         $overallWinRate = $totalGames > 0
             ? round((clone $logsAll)->where('won', true)->count() / $totalGames * 100, 1)
@@ -304,13 +326,33 @@ class AdminController extends Controller
 
         $spinTopPlayers = $topQuery('spin');
         $diceTopPlayers = $topQuery('dice');
+        $rpsTopPlayers = $topQuery('rps');
+
+        // Finance summary for easier admin management
+        $todayBase = MiniGameLog::whereDate('created_at', today());
+        $todayRevenue = (float) (clone $todayBase)->sum('bet_amount');
+        $todayPayout = (float) (clone $todayBase)->sum('payout');
+        $todayNet = $todayRevenue - $todayPayout;
+
+        $monthBase = MiniGameLog::where('created_at', '>=', $monthStart);
+        $monthRevenue = (float) (clone $monthBase)->sum('bet_amount');
+        $monthPayout = (float) (clone $monthBase)->sum('payout');
+        $monthNet = $monthRevenue - $monthPayout;
+
+        $rpsMonthBase = MiniGameLog::where('game_type', 'rps')->where('created_at', '>=', $monthStart);
+        $rpsMonthGames = (int) (clone $rpsMonthBase)->count();
+        $rpsMonthWins = (int) (clone $rpsMonthBase)->where('won', true)->count();
+        $rpsMonthWinRate = $rpsMonthGames > 0 ? round($rpsMonthWins * 100 / $rpsMonthGames, 1) : 0;
+        $rpsMonthWinRateTarget = (float) GameSetting::get('rps_monthly_win_rate_target', '45');
 
         // Load all current settings for the config form
         $settings = GameSetting::all()->map(fn($s) => $s->value);
 
         return view('admin.casino', compact(
-            'spinStats','diceStats','totalGames','houseProfit',
-            'overallWinRate','winnersCount','spinTopPlayers','diceTopPlayers',
+            'spinStats','diceStats','rpsStats','totalGames','houseProfit',
+            'overallWinRate','winnersCount','spinTopPlayers','diceTopPlayers','rpsTopPlayers',
+            'todayRevenue','todayPayout','todayNet','monthRevenue','monthPayout','monthNet',
+            'rpsMonthGames','rpsMonthWinRate','rpsMonthWinRateTarget',
             'settings'
         ));
     }
@@ -331,17 +373,159 @@ class AdminController extends Controller
             'dice_win_rate_limit' => 'required|numeric|min:10|max:95',
             'dice_payout_mult'    => 'required|numeric|min:1.0|max:5.0',
             'dice_max_bet'        => 'required|numeric|min:0',
+            'rps_enabled'         => 'required|in:0,1',
+            'rps_house_edge'      => 'required|in:0,1',
+            'rps_win_rate_limit'  => 'required|numeric|min:10|max:95',
+            'rps_win_rate_target' => 'required|numeric|min:5|max:90',
+            'rps_monthly_win_rate_target' => 'required|numeric|min:5|max:90',
+            'rps_draw_rate'       => 'required|numeric|min:0|max:40',
+            'rps_single_payout_mult' => 'required|numeric|min:1.0|max:5.0',
+            'rps_bo3_payout_mult' => 'required|numeric|min:1.0|max:8.0',
+            'rps_max_bet'         => 'required|numeric|min:0',
+            'farm_sell_win_rate_target' => 'required|numeric|min:5|max:95',
+            'farm_sell_loss_pool'       => 'required|string|max:255',
+            'farm_sell_win_pool'        => 'required|string|max:255',
         ]);
 
         $keys = [
             'spin_enabled','spin_house_edge','spin_win_rate_limit','spin_win_rate_target','spin_max_bet',
             'dice_enabled','dice_house_edge','dice_win_rate_limit','dice_payout_mult','dice_max_bet',
+            'rps_enabled','rps_house_edge','rps_win_rate_limit','rps_win_rate_target','rps_monthly_win_rate_target','rps_draw_rate','rps_single_payout_mult','rps_bo3_payout_mult','rps_max_bet',
+            'farm_sell_win_rate_target','farm_sell_loss_pool','farm_sell_win_pool',
         ];
         foreach ($keys as $key) {
             GameSetting::set($key, $request->input($key));
         }
 
         return response()->json(['success' => true, 'message' => 'Đã lưu cấu hình Casino thành công!']);
+    }
+
+    /**
+     * Trang quản lý liên hệ hỗ trợ
+     */
+    public function supportContacts()
+    {
+        $keys = [
+            'support_title',
+            'support_subtitle',
+            'support_center_label',
+            'support_phone',
+            'support_email',
+            'support_zalo_url',
+            'support_messenger_url',
+            'support_working_hours',
+            'telegram_enabled',
+            'telegram_bot_token',
+            'telegram_chat_id',
+        ];
+
+        $settings = GameSetting::getMany($keys);
+
+        $defaults = [
+            'support_title' => 'Liên hệ hỗ trợ',
+            'support_subtitle' => 'Hỗ trợ nhanh khi cần xử lý giao dịch / game',
+            'support_center_label' => 'Trung tâm hỗ trợ MXH',
+            'support_phone' => '0900000000',
+            'support_email' => 'support@aquahub.vn',
+            'support_zalo_url' => 'https://zalo.me',
+            'support_messenger_url' => 'https://m.me',
+            'support_working_hours' => '08:00 - 22:00 mỗi ngày',
+            'telegram_enabled' => '0',
+            'telegram_bot_token' => '',
+            'telegram_chat_id' => '',
+        ];
+
+        $settings = array_merge($defaults, $settings);
+
+        return view('admin.support-contacts', compact('settings'));
+    }
+
+    /**
+     * Lưu cấu hình liên hệ hỗ trợ
+     */
+    public function saveSupportContacts(Request $request)
+    {
+        $validated = $request->validate([
+            'support_title' => 'required|string|max:120',
+            'support_subtitle' => 'required|string|max:255',
+            'support_center_label' => 'required|string|max:120',
+            'support_phone' => 'required|string|max:30',
+            'support_email' => 'required|email|max:120',
+            'support_zalo_url' => 'required|url|max:255',
+            'support_messenger_url' => 'required|url|max:255',
+            'support_working_hours' => 'required|string|max:120',
+            'telegram_enabled' => 'nullable|in:0,1',
+            'telegram_bot_token' => 'nullable|string|max:255',
+            'telegram_chat_id' => 'nullable|string|max:120',
+        ]);
+
+        $validated['telegram_enabled'] = $request->input('telegram_enabled', '0');
+
+        foreach ($validated as $key => $value) {
+            GameSetting::set($key, (string) $value);
+        }
+
+        return redirect()
+            ->route('admin.support.contacts')
+            ->with('success', 'Đã lưu thông tin liên hệ hỗ trợ thành công!');
+    }
+
+    /**
+     * Tổng thống kê doanh thu game cho admin
+     */
+    public function financeSummary()
+    {
+        $todayStart = now()->startOfDay();
+        $weekStart = now()->startOfWeek();
+        $monthStart = now()->startOfMonth();
+
+        $sum = function ($from) {
+            $base = MiniGameLog::where('created_at', '>=', $from);
+            $revenue = (float) (clone $base)->sum('bet_amount');
+            $payout = (float) (clone $base)->sum('payout');
+            return [
+                'revenue' => $revenue,
+                'payout' => $payout,
+                'net' => $revenue - $payout,
+                'games' => (int) (clone $base)->count(),
+            ];
+        };
+
+        $today = $sum($todayStart);
+        $week = $sum($weekStart);
+        $month = $sum($monthStart);
+
+        $byGame = MiniGameLog::selectRaw('game_type, COUNT(*) as total_games, SUM(bet_amount) as revenue, SUM(payout) as payout, SUM(bet_amount - payout) as net')
+            ->where('created_at', '>=', $monthStart)
+            ->groupBy('game_type')
+            ->orderByDesc('revenue')
+            ->get();
+
+        return view('admin.finance-summary', compact('today', 'week', 'month', 'byGame'));
+    }
+
+    /**
+     * Báo cáo doanh thu lỗ cho admin
+     */
+    public function financeLoss()
+    {
+        $days = MiniGameLog::selectRaw('DATE(created_at) as report_date, SUM(bet_amount) as revenue, SUM(payout) as payout, SUM(bet_amount - payout) as net')
+            ->where('created_at', '>=', now()->subDays(30)->startOfDay())
+            ->groupBy('report_date')
+            ->orderBy('report_date', 'desc')
+            ->get();
+
+        $lossDays = $days->where('net', '<', 0)->count();
+        $totalLoss = (float) $days->where('net', '<', 0)->sum('net');
+        $totalProfit = (float) $days->where('net', '>=', 0)->sum('net');
+
+        $lossByGame = MiniGameLog::selectRaw('game_type, SUM(bet_amount - payout) as net')
+            ->where('created_at', '>=', now()->subDays(30)->startOfDay())
+            ->groupBy('game_type')
+            ->orderBy('net')
+            ->get();
+
+        return view('admin.finance-loss', compact('days', 'lossDays', 'totalLoss', 'totalProfit', 'lossByGame'));
     }
 
     // ═══════════════════════════════════════

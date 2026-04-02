@@ -33,7 +33,7 @@
                     <td>{{ $item->id }}</td>
                     <td>
                         @if($item->image)
-                            <img src="{{ asset($item->image) }}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;">
+                            <img src="{{ $item->image_url }}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;">
                         @else
                             <div style="width:50px; height:50px; background:var(--bg-card2); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.5rem">🎁</div>
                         @endif

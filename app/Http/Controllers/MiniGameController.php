@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 
 class MiniGameController extends Controller
 {
+    private const RPS_CHOICES = ['keo', 'bua', 'bao'];
+
     // ─────────────────────────────────────────
     // VÒNG QUAY MAY MẮN
     // ─────────────────────────────────────────
@@ -238,6 +240,219 @@ class MiniGameController extends Controller
     }
 
     // ─────────────────────────────────────────
+    // KÉO BÚA BAO
+    // ─────────────────────────────────────────
+
+    public function rpsIndex()
+    {
+        if (!GameSetting::get('rps_enabled', '1')) {
+            abort(503, 'Kéo Búa Bao đang bảo trì.');
+        }
+
+        $history = MiniGameLog::where('user_id', auth()->id())
+            ->where('game_type', 'rps')
+            ->latest()
+            ->take(50)
+            ->get();
+
+        $today = now()->startOfDay();
+        $week = now()->startOfWeek();
+
+        $leaderboardToday = MiniGameLog::with('user')
+            ->where('game_type', 'rps')
+            ->where('created_at', '>=', $today)
+            ->selectRaw('user_id, COUNT(*) as total_games, SUM(won) as total_wins, ROUND(SUM(won) * 100.0 / COUNT(*), 1) as win_rate, SUM(profit) as total_profit')
+            ->groupBy('user_id')
+            ->orderByDesc('total_profit')
+            ->take(20)
+            ->get();
+
+        $leaderboardWeek = MiniGameLog::with('user')
+            ->where('game_type', 'rps')
+            ->where('created_at', '>=', $week)
+            ->selectRaw('user_id, COUNT(*) as total_games, SUM(won) as total_wins, ROUND(SUM(won) * 100.0 / COUNT(*), 1) as win_rate, SUM(profit) as total_profit')
+            ->groupBy('user_id')
+            ->orderByDesc('total_profit')
+            ->take(20)
+            ->get();
+
+        return view('games.rps', compact('history', 'leaderboardToday', 'leaderboardWeek'));
+    }
+
+    public function doRps(Request $request)
+    {
+        if (!GameSetting::get('rps_enabled', '1')) {
+            return response()->json(['success' => false, 'message' => 'Kéo Búa Bao đang tạm dừng bởi Admin.']);
+        }
+
+        $request->validate([
+            'bet_amount' => 'required|numeric|min:1',
+            'choice' => 'required|in:keo,bua,bao',
+            'mode' => 'nullable|in:single,bo3',
+        ]);
+
+        $user = auth()->user();
+        $amount = (float) $request->bet_amount;
+        $choice = (string) $request->choice;
+        $mode = (string) ($request->mode ?: 'single');
+
+        $maxBet = (float) GameSetting::get('rps_max_bet', '0');
+        if ($maxBet > 0 && $amount > $maxBet) {
+            return response()->json(['success' => false, 'message' => "Cược tối đa là {$maxBet} PT."]);
+        }
+
+        if ($user->balance_point < $amount) {
+            return response()->json(['success' => false, 'message' => 'Số dư không đủ.']);
+        }
+
+        $winRateTarget = (float) GameSetting::get('rps_win_rate_target', '45');
+        $winRateTarget = max(5, min(90, $winRateTarget));
+        $monthlyWinRateTarget = (float) GameSetting::get('rps_monthly_win_rate_target', (string) $winRateTarget);
+        $monthlyWinRateTarget = max(5, min(90, $monthlyWinRateTarget));
+        $drawRate = (float) GameSetting::get('rps_draw_rate', '10');
+        $drawRate = max(0, min(40, $drawRate));
+
+        $houseEdgeEnabled = (bool) (int) GameSetting::get('rps_house_edge', '1');
+        $winRateLimit = (float) GameSetting::get('rps_win_rate_limit', '65');
+        $recentWinRate = $this->getRecentWinRate($user->id, 'rps', 12);
+        if ($houseEdgeEnabled && $recentWinRate > ($winRateLimit / 100)) {
+            $over = $recentWinRate - ($winRateLimit / 100);
+            $winRateTarget = max(5, $winRateTarget - min(25, $over * 100));
+        }
+
+        // Monthly target control to keep long-run RPS rate close to admin setting.
+        $monthStart = now()->startOfMonth();
+        $monthBase = MiniGameLog::where('game_type', 'rps')
+            ->where('created_at', '>=', $monthStart);
+        $monthGames = (int) (clone $monthBase)->count();
+        if ($monthGames >= 30) {
+            $monthWins = (int) (clone $monthBase)->where('won', true)->count();
+            $monthWinRate = $monthWins * 100 / max(1, $monthGames);
+            $delta = $monthWinRate - $monthlyWinRateTarget;
+
+            if ($delta > 0) {
+                $winRateTarget = max(5, $winRateTarget - min(20, $delta * 0.6));
+            } elseif ($delta < 0) {
+                $winRateTarget = min(90, $winRateTarget + min(10, abs($delta) * 0.3));
+            }
+        }
+
+        $singlePayoutMult = (float) GameSetting::get('rps_single_payout_mult', '1.95');
+        $bo3PayoutMult = (float) GameSetting::get('rps_bo3_payout_mult', '2.70');
+
+        $rounds = [];
+        $userWins = 0;
+        $botWins = 0;
+        $draws = 0;
+
+        $targetWins = $mode === 'bo3' ? 2 : 1;
+        $maxRounds = $mode === 'bo3' ? 9 : 1;
+
+        for ($round = 1; $round <= $maxRounds; $round++) {
+            if ($userWins >= $targetWins || $botWins >= $targetWins) {
+                break;
+            }
+
+            $roll = random_int(1, 10000);
+            $winThreshold = (int) round($winRateTarget * 100);
+            $drawThreshold = (int) round(($winRateTarget + $drawRate) * 100);
+
+            if ($roll <= $winThreshold) {
+                $expected = 'win';
+            } elseif ($roll <= $drawThreshold) {
+                $expected = 'draw';
+            } else {
+                $expected = 'lose';
+            }
+
+            $botChoice = $this->buildRpsBotChoice($choice, $expected);
+            $result = $this->judgeRpsRound($choice, $botChoice);
+
+            if ($result === 'win') {
+                $userWins++;
+            } elseif ($result === 'lose') {
+                $botWins++;
+            } else {
+                $draws++;
+            }
+
+            $rounds[] = [
+                'round' => $round,
+                'player' => $choice,
+                'bot' => $botChoice,
+                'result' => $result,
+            ];
+
+            if ($mode === 'single') {
+                break;
+            }
+        }
+
+        $final = 'draw';
+        if ($userWins > $botWins) {
+            $final = 'win';
+        } elseif ($botWins > $userWins) {
+            $final = 'lose';
+        }
+
+        if ($mode === 'single') {
+            $payout = $final === 'win'
+                ? round($amount * $singlePayoutMult, 2)
+                : ($final === 'draw' ? round($amount, 2) : 0);
+        } else {
+            $payout = $final === 'win' ? round($amount * $bo3PayoutMult, 2) : 0;
+        }
+
+        $profit = $payout - $amount;
+        $won = $profit > 0;
+
+        DB::transaction(function () use ($user, $amount, $payout, $profit, $won, $mode, $choice, $rounds, $final, $userWins, $botWins, $draws) {
+            $user->decrement('balance_point', $amount);
+            if ($payout > 0) {
+                $user->increment('balance_point', $payout);
+            }
+
+            MiniGameLog::create([
+                'user_id' => $user->id,
+                'game_type' => 'rps',
+                'bet_amount' => $amount,
+                'payout' => $payout,
+                'profit' => $profit,
+                'won' => $won,
+                'details' => [
+                    'mode' => $mode,
+                    'choice' => $choice,
+                    'rounds' => $rounds,
+                    'final' => $final,
+                    'score' => [
+                        'user' => $userWins,
+                        'bot' => $botWins,
+                        'draw' => $draws,
+                    ],
+                ],
+            ]);
+        });
+
+        $newBalance = number_format((float) $user->fresh()->balance_point, 2);
+
+        return response()->json([
+            'success' => true,
+            'mode' => $mode,
+            'choice' => $choice,
+            'rounds' => $rounds,
+            'final' => $final,
+            'score' => ['user' => $userWins, 'bot' => $botWins, 'draw' => $draws],
+            'payout' => $payout,
+            'profit' => $profit,
+            'won' => $won,
+            'new_balance' => $newBalance,
+            'message' => $final === 'win'
+                ? "🎉 Bạn thắng! +{$profit} PT"
+                : ($final === 'draw' ? "🤝 Hòa! Hoàn cược {$payout} PT" : "💸 Bạn thua!"),
+        ]);
+    }
+
+    // ─────────────────────────────────────────
     // HELPERS
     // ─────────────────────────────────────────
 
@@ -263,5 +478,41 @@ class MiniGameController extends Controller
             if ($rand <= $cumul) return $item;
         }
         return end($items);
+    }
+
+    private function judgeRpsRound(string $player, string $bot): string
+    {
+        if ($player === $bot) {
+            return 'draw';
+        }
+
+        $beats = [
+            'keo' => 'bao',
+            'bao' => 'bua',
+            'bua' => 'keo',
+        ];
+
+        return ($beats[$player] ?? '') === $bot ? 'win' : 'lose';
+    }
+
+    private function buildRpsBotChoice(string $player, string $expected): string
+    {
+        if ($expected === 'draw') {
+            return $player;
+        }
+
+        if ($expected === 'win') {
+            return match ($player) {
+                'keo' => 'bao',
+                'bua' => 'keo',
+                default => 'bua',
+            };
+        }
+
+        return match ($player) {
+            'keo' => 'bua',
+            'bua' => 'bao',
+            default => 'keo',
+        };
     }
 }

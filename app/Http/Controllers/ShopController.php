@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ExchangeRequest;
 use App\Models\RewardItem;
+use App\Services\TelegramNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -62,6 +63,14 @@ class ShopController extends Controller
                 'status' => 'pending',
             ]);
         });
+
+        TelegramNotifier::send(
+            "<b>🎁 Yêu cầu đổi quà mới</b>\n"
+            . "User: {$user->name} (#{$user->id})\n"
+            . "Quà: {$item->name}\n"
+            . "Điểm: " . number_format((float) $item->point_price, 0) . " PT\n"
+            . "Trạng thái: <b>pending</b>"
+        );
 
         return response()->json([
             'success' => true,
