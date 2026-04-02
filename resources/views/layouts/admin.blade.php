@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin') | AquaHub Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -286,7 +286,7 @@
             color: var(--text);
             padding: 0.575rem 0.875rem;
             width: 100%;
-            font-size: 0.875rem;
+            font-size: 16px; /* Fix auto-zoom on Mobile */
             font-family: 'Inter', sans-serif;
         }
         .form-control:focus { outline: none; border-color: var(--primary); }

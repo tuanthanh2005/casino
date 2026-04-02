@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'AquaHub - Kết nối Dịch vụ & Giải trí') | AquaHub</title>
     <meta name="description" content="Webgame dự đoán giá Bitcoin Long/Short - Đổi Point lấy quà tặng Premium">
@@ -372,7 +372,7 @@
             padding: 0.65rem 1rem;
             width: 100%;
             font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
+            font-size: 16px; /* Fix auto-zoom on Mobile */
             transition: border-color 0.2s;
         }
         .form-control:focus {
