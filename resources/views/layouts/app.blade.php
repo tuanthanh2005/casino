@@ -4,43 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'AquaHub Pro - Dự Đoán BTC, Mini Games & Nông Trại Kiếm Point')</title>
-    <meta name="description" content="AquaHub Pro - Nền tảng giải trí đa năng: Dự đoán giá Bitcoin Long/Short, Mini Games hấp dẫn và Nông trại ảo. Tích lũy Point đổi quà tặng Premium ngay hôm nay.">
-    <meta name="keywords" content="aquahub, aquahub pro, dự đoán btc, game nông trại, mini games, đổi thưởng, bitcoin prediction">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('av.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('av.png') }}">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="AquaHub Pro - Kết Nối Dịch Vụ & Giải Trí Đỉnh Cao">
-    <meta property="og:description" content="Dự đoán BTC, Mini Games & Nông Trại. Hệ thống giải trí minh bạch, uy tín tại AquaHub Pro.">
-    <meta property="og:image" content="{{ asset('av.png') }}">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="AquaHub Pro - Mini Games & BTC Prediction">
-    <meta property="twitter:description" content="Nền tảng giải trí đa năng tích hợp nông trại và dự đoán giá Crypto.">
-    <meta property="twitter:image" content="{{ asset('av.png') }}">
-
-    <!-- Schema.org JSON-LD -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "AquaHub Pro",
-      "url": "https://aquahub.pro",
-      "description": "Nền tảng Mini Games, Dự đoán giá BTC và Nông trại giải trí tích hợp.",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://aquahub.pro/?s={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
+    <title>@yield('title', 'AquaHub - Kết nối Dịch vụ & Giải trí') | AquaHub</title>
+    <meta name="description" content="Webgame dự đoán giá Bitcoin Long/Short - Đổi Point lấy quà tặng Premium">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
