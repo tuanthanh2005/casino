@@ -11,6 +11,16 @@
 <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
+@if($errors->any())
+<div class="alert alert-danger">
+    <ul style="margin:0; padding-left:1rem">
+        @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
 <div class="card">
     <div class="table-wrapper">
         <table>
@@ -59,9 +69,16 @@
 </div>
 
 {{-- ADD/EDIT MODAL --}}
-<div class="modal-overlay" id="seed-modal">
+<div class="modal-overlay @if($errors->any()) active @endif" id="seed-modal">
     <div class="modal-box" style="max-width:520px">
         <div class="modal-title" id="modal-title">Thêm hạt giống</div>
+        
+        @if($errors->any())
+        <div style="background:rgba(255,0,0,0.1); border-left:4px solid red; padding:0.5rem; margin-bottom:1rem; font-size:0.85rem; color:#ffb7b7">
+            Vui lòng kiểm tra lại các thông tin bên dưới.
+        </div>
+        @endif
+
         <form id="seed-form" method="POST" action="{{ route('admin.farm.seeds.store') }}">
             @csrf
             <input type="hidden" name="_method" id="form-method" value="POST">

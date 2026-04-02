@@ -49,7 +49,7 @@ class FarmAdminController extends Controller
 
     public function storeSeed(Request $request)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'name'            => 'required|string|max:80',
             'emoji'           => 'required|string|max:10',
             'description'     => 'nullable|string|max:255',
@@ -57,11 +57,17 @@ class FarmAdminController extends Controller
             'price_sell_base' => 'required|numeric|min:1',
             'grow_time_mins'  => 'required|integer|min:1',
             'max_waterings'   => 'required|integer|min:1|max:20',
-            'lucky_chance'    => 'required|numeric|min:0|max:1',
+            'lucky_chance'    => 'required|numeric|min:0', // Sẽ chia 100 nếu > 1
             'is_active'       => 'boolean',
             'sort_order'      => 'integer|min:0',
         ]);
 
+        $lucky = (float) $validated['lucky_chance'];
+        if ($lucky > 1) $lucky = $lucky / 100;
+        if ($lucky > 1) $lucky = 1; // Giới hạn tối đa 100%
+
+        $data = $validated;
+        $data['lucky_chance'] = $lucky;
         $data['slug'] = Str::slug($data['name']) . '-' . now()->timestamp;
         $data['is_active'] = $request->boolean('is_active');
 
@@ -71,7 +77,7 @@ class FarmAdminController extends Controller
 
     public function updateSeed(Request $request, SeedType $seed)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'name'            => 'required|string|max:80',
             'emoji'           => 'required|string|max:10',
             'description'     => 'nullable|string|max:255',
@@ -79,11 +85,17 @@ class FarmAdminController extends Controller
             'price_sell_base' => 'required|numeric|min:1',
             'grow_time_mins'  => 'required|integer|min:1',
             'max_waterings'   => 'required|integer|min:1|max:20',
-            'lucky_chance'    => 'required|numeric|min:0|max:1',
+            'lucky_chance'    => 'required|numeric|min:0',
             'is_active'       => 'boolean',
             'sort_order'      => 'integer|min:0',
         ]);
 
+        $lucky = (float) $validated['lucky_chance'];
+        if ($lucky > 1) $lucky = $lucky / 100;
+        if ($lucky > 1) $lucky = 1;
+
+        $data = $validated;
+        $data['lucky_chance'] = $lucky;
         $data['is_active'] = $request->boolean('is_active');
         $seed->update($data);
 
