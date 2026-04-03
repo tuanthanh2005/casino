@@ -1018,7 +1018,7 @@
         $supportTitle = $supportSettings['support_title'] ?? 'Liên hệ hỗ trợ';
         $supportSubtitle = $supportSettings['support_subtitle'] ?? 'Hỗ trợ nhanh khi cần xử lý giao dịch / game';
         $supportCenterLabel = $supportSettings['support_center_label'] ?? 'Trung tâm hỗ trợ MXH';
-        $supportPhone = $supportSettings['support_phone'] ?? '0900000000';
+        $supportPhone = $supportSettings['support_phone'] ?? 'https://t.me/aquahub';
         $supportEmail = $supportSettings['support_email'] ?? 'support@aquahub.vn';
         $supportZaloUrl = $supportSettings['support_zalo_url'] ?? 'https://t.me';
         $supportMessengerUrl = $supportSettings['support_messenger_url'] ?? 'https://m.me';
@@ -1091,8 +1091,8 @@
                 <a href="{{ route('nav.index') }}" class="btn btn-outline" style="justify-content:flex-start">
                     <i class="bi bi-shield-check"></i> {{ $supportCenterLabel }}
                 </a>
-                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $supportPhone) }}" class="btn btn-outline" style="justify-content:flex-start">
-                    <i class="bi bi-telephone"></i> Hotline: {{ $supportPhone }}
+                <a href="{{ $supportPhone }}" target="_blank" rel="noopener" class="btn btn-outline" style="justify-content:flex-start">
+                    <i class="bi bi-people"></i> Group cộng đồng AquaHub
                 </a>
                 <a href="mailto:{{ $supportEmail }}" class="btn btn-outline" style="justify-content:flex-start">
                     <i class="bi bi-envelope"></i> Email: {{ $supportEmail }}

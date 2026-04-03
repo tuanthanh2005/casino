@@ -32,8 +32,9 @@
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem">
                 <div>
-                    <label class="form-label">Hotline</label>
-                    <input type="text" name="support_phone" class="form-control" value="{{ old('support_phone', $settings['support_phone']) }}" required>
+                    <label class="form-label">Link group cộng đồng AquaHub (Telegram)</label>
+                    <input type="url" name="support_phone" class="form-control" value="{{ old('support_phone', $settings['support_phone']) }}" required>
+                    <div style="margin-top:0.35rem; font-size:0.78rem; color:var(--text-muted)">Ví dụ: https://t.me/aquahub</div>
                 </div>
                 <div>
                     <label class="form-label">Email</label>

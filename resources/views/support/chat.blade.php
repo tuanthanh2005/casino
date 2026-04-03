@@ -65,8 +65,8 @@
             <a href="{{ route('nav.index') }}" class="btn btn-outline" style="justify-content:flex-start">
                 <i class="bi bi-shield-check"></i> {{ $support['center_label'] }}
             </a>
-            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $support['phone']) }}" class="btn btn-outline" style="justify-content:flex-start">
-                <i class="bi bi-telephone"></i> Hotline: {{ $support['phone'] }}
+            <a href="{{ $support['phone'] }}" target="_blank" rel="noopener" class="btn btn-outline" style="justify-content:flex-start">
+                <i class="bi bi-people"></i> Group cộng đồng AquaHub
             </a>
             <a href="mailto:{{ $support['email'] }}" class="btn btn-outline" style="justify-content:flex-start">
                 <i class="bi bi-envelope"></i> Email: {{ $support['email'] }}

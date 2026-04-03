@@ -33,7 +33,7 @@ class SupportChatController extends Controller
 
         $support = [
             'center_label' => $supportSettings['support_center_label'] ?? 'Trung tâm hỗ trợ MXH',
-            'phone' => $supportSettings['support_phone'] ?? '0900000000',
+            'phone' => $supportSettings['support_phone'] ?? 'https://t.me/aquahub',
             'email' => $supportSettings['support_email'] ?? 'support@aquahub.vn',
             'zalo_url' => $supportSettings['support_zalo_url'] ?? 'https://t.me',
             'messenger_url' => $supportSettings['support_messenger_url'] ?? 'https://m.me',
