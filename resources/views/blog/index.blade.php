@@ -15,7 +15,9 @@
         @forelse($posts as $post)
             <article class="card" style="display:flex; flex-direction:column; overflow:hidden;">
                 @if($post->cover_image)
-                    <img src="{{ $post->cover_image_url }}" alt="{{ $post->title }}" style="width:100%; height:170px; object-fit:cover;">
+                    <div class="blog-card-cover-frame">
+                        <img src="{{ $post->cover_image_url }}" alt="{{ $post->title }}" class="blog-card-cover-image">
+                    </div>
                 @else
                     <div style="height:170px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, rgba(6,182,212,0.15), rgba(16,185,129,0.18)); font-size:2rem;">🌊</div>
                 @endif
@@ -47,3 +49,25 @@
     @endif
 </div>
 @endsection
+
+@push('styles')
+<style>
+    .blog-card-cover-frame {
+        width: 100%;
+        height: 170px;
+        padding: 0.45rem;
+        background:
+            radial-gradient(circle at 20% 20%, rgba(6, 182, 212, 0.16), transparent 42%),
+            radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.14), transparent 46%),
+            #07101e;
+    }
+
+    .blog-card-cover-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+        border-radius: 10px;
+    }
+</style>
+@endpush

@@ -9,7 +9,9 @@
 <div style="max-width:980px; margin:0 auto;">
     <article class="card" style="overflow:hidden;">
         @if($post->cover_image)
-            <img src="{{ $post->cover_image_url }}" alt="{{ $post->title }}" style="width:100%; max-height:360px; object-fit:cover;">
+            <div class="post-cover-frame">
+                <img src="{{ $post->cover_image_url }}" alt="{{ $post->title }}" class="post-cover-image">
+            </div>
         @endif
 
         <div class="card-body" style="padding:1.5rem 1.35rem;">
@@ -51,6 +53,27 @@
 
 @push('styles')
 <style>
+    .post-cover-frame {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+            radial-gradient(circle at 20% 20%, rgba(6, 182, 212, 0.16), transparent 42%),
+            radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.14), transparent 46%),
+            #070d19;
+        padding: 0.7rem;
+    }
+
+    .post-cover-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+        border-radius: 12px;
+    }
+
     .blog-content h1,
     .blog-content h2,
     .blog-content h3,
