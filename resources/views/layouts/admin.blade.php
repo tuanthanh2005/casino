@@ -389,6 +389,12 @@
             <li>
                 <a href="{{ route('admin.support.chat') }}" class="{{ request()->routeIs('admin.support.chat*') ? 'active' : '' }}">
                     <i class="bi bi-chat-square-dots"></i> 💬 Chat khách hàng
+                    @php $supportUnread = \App\Models\SupportChat::where('from_role', 'user')->where('is_read', false)->count(); @endphp
+                    @if($supportUnread > 0)
+                        <span style="margin-left:auto; background:var(--danger); color:white; border-radius:100px; padding:0.1rem 0.5rem; font-size:0.7rem; font-weight:700">
+                            {{ $supportUnread }}
+                        </span>
+                    @endif
                 </a>
             </li>
             <li>
