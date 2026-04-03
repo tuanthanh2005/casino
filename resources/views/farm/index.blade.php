@@ -536,11 +536,11 @@
         @media (max-width: 768px) {
             .farm-wrap {
                 display: block !important;
-                margin-top: 2.5rem !important; /* Space for floating header */
+                margin-top: 2rem !important; /* Space for floating header */
             }
             .farm-wrap > div:last-child {
                 display: block !important;
-                margin-top: 1rem;
+                margin-top: 2rem; /* Tăng khoảng cách giữa vườn và phần sidebar bên dưới */
             }
 
             /* Keep sidebar cards visible on mobile */
@@ -567,6 +567,20 @@
             
             #panel-farm.active, #panel-shop-mobile.active, #panel-bag-mobile.active, #panel-market-mobile.active {
                 display: block !important;
+                margin-bottom: 2rem !important; /* Đảm bảo các khối không dính nhau */
+            }
+
+            .farm-sidebar {
+                gap: 2rem !important; /* Tăng khoảng cách giữa các card trong sidebar */
+            }
+
+            .card {
+                margin-bottom: 2rem !important;
+            }
+
+            .seed-item {
+                margin-bottom: 1rem !important; /* Tăng khoảng cách giữa các loại hạt giống */
+                padding: 1rem !important;
             }
             
             .side-panel {
