@@ -1,0 +1,29 @@
+{
+    "name": "AquaHub Pro",
+    "short_name": "AquaHub",
+    "description": "Nền tảng giải trí AquaHub - Mini Games, Dự đoán BTC & Nông Trại",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0a0a0f",
+    "theme_color": "#06b6d4",
+    "lang": "vi",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "/av.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/av.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["games", "entertainment"],
+    "screenshots": [],
+    "prefer_related_applications": false
+}

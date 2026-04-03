@@ -1,124 +1,172 @@
-{{-- App Download Banner Component --}}
-{{-- Sử dụng GameSetting để lấy data, hiển thị nút tải Android & iOS --}}
+{{-- App Download / PWA Install Banner --}}
 @php
     $appEnabled = \App\Models\GameSetting::get('app_download_enabled', '1');
     if ($appEnabled != '1') return;
 
-    $bannerTitle    = \App\Models\GameSetting::get('app_banner_title', 'Tải App AquaHub');
-    $bannerSubtitle = \App\Models\GameSetting::get('app_banner_subtitle', 'Trải nghiệm tốt hơn với ứng dụng di động');
-    $androidUrl     = \App\Models\GameSetting::get('app_android_url', '#');
-    $iosUrl         = \App\Models\GameSetting::get('app_ios_url', '#');
+    $bannerTitle    = \App\Models\GameSetting::get('app_banner_title', 'Cài App AquaHub');
+    $bannerSubtitle = \App\Models\GameSetting::get('app_banner_subtitle', 'Cài trực tiếp lên điện thoại — không cần App Store');
+    $androidUrl     = \App\Models\GameSetting::get('app_android_url', '');
+    $iosUrl         = \App\Models\GameSetting::get('app_ios_url', '');
     $androidIcon    = \App\Models\GameSetting::get('app_android_icon', '');
     $iosIcon        = \App\Models\GameSetting::get('app_ios_icon', '');
-    $androidLabel   = \App\Models\GameSetting::get('app_android_label', 'Tải cho Android');
-    $iosLabel       = \App\Models\GameSetting::get('app_ios_label', 'Tải cho iOS');
+    $androidLabel   = \App\Models\GameSetting::get('app_android_label', 'Cài cho Android');
+    $iosLabel       = \App\Models\GameSetting::get('app_ios_label', 'Cài cho iOS');
 @endphp
 
-{{-- ═══════════════════════════════════════ --}}
-{{-- BANNER (full width, collapsible)       --}}
-{{-- ═══════════════════════════════════════ --}}
+{{-- ═══════════════ BANNER ═══════════════ --}}
 <div class="app-download-banner" id="app-download-banner">
     <div class="app-banner-inner">
-        <!-- Left: Icon + Text -->
+
+        {{-- Icon + Text --}}
         <div class="app-banner-text">
-            <div class="app-banner-icon-wrap">
-                <span class="app-banner-main-icon">📱</span>
-            </div>
+            <div class="app-banner-icon-wrap">📱</div>
             <div>
                 <div class="app-banner-subtitle">{{ $bannerSubtitle }}</div>
                 <div class="app-banner-title">{{ $bannerTitle }}</div>
             </div>
         </div>
 
-        <!-- Right: Buttons -->
+        {{-- Nút tải --}}
         <div class="app-banner-buttons">
-            @if($androidUrl && $androidUrl !== '#')
-                <a href="{{ $androidUrl }}"
-                   class="app-dl-btn app-dl-btn--android"
-                   target="_blank" rel="noopener">
-            @else
-                <a href="javascript:void(0)"
-                   class="app-dl-btn app-dl-btn--android"
-                   onclick="appDlNotReady('Android')"
-                   data-coming-soon="1">
-            @endif
-                @if($androidIcon)
-                    <img src="{{ asset($androidIcon) }}" class="app-dl-btn-icon" alt="Android">
-                @else
-                    <span class="app-dl-btn-emoji">🤖</span>
-                @endif
-                <div class="app-dl-btn-text">
-                    <span class="app-dl-btn-store">
-                        @if(!$androidUrl || $androidUrl === '#')
-                            Sắp ra mắt
-                        @else
-                            Google Play
-                        @endif
-                    </span>
-                    <span class="app-dl-btn-label">{{ $androidLabel }}</span>
-                </div>
-            </a>
 
-            @if($iosUrl && $iosUrl !== '#')
-                <a href="{{ $iosUrl }}"
-                   class="app-dl-btn app-dl-btn--ios"
+            {{-- NÚT ANDROID: PWA install hoặc link APK --}}
+            @if($androidUrl && $androidUrl !== '#')
+                {{-- Có link APK/Play Store → mở link --}}
+                <a href="{{ $androidUrl }}" class="app-dl-btn app-dl-btn--android"
                    target="_blank" rel="noopener">
+                    @if($androidIcon)
+                        <img src="{{ asset($androidIcon) }}" class="app-dl-btn-icon" alt="">
+                    @else
+                        <span class="app-dl-btn-emoji">🤖</span>
+                    @endif
+                    <div class="app-dl-btn-text">
+                        <span class="app-dl-btn-store">Google Play</span>
+                        <span class="app-dl-btn-label">{{ $androidLabel }}</span>
+                    </div>
+                </a>
             @else
-                <a href="javascript:void(0)"
-                   class="app-dl-btn app-dl-btn--ios"
-                   onclick="appDlNotReady('iOS')"
-                   data-coming-soon="1">
+                {{-- Không có link → dùng PWA install --}}
+                <button type="button" class="app-dl-btn app-dl-btn--android" id="btn-pwa-android"
+                        onclick="triggerPwaInstall('android')">
+                    @if($androidIcon)
+                        <img src="{{ asset($androidIcon) }}" class="app-dl-btn-icon" alt="">
+                    @else
+                        <span class="app-dl-btn-emoji">🤖</span>
+                    @endif
+                    <div class="app-dl-btn-text">
+                        <span class="app-dl-btn-store" id="android-store-label">Cài vào máy</span>
+                        <span class="app-dl-btn-label">{{ $androidLabel }}</span>
+                    </div>
+                </button>
             @endif
-                @if($iosIcon)
-                    <img src="{{ asset($iosIcon) }}" class="app-dl-btn-icon" alt="iOS">
-                @else
-                    <span class="app-dl-btn-emoji">🍎</span>
-                @endif
-                <div class="app-dl-btn-text">
-                    <span class="app-dl-btn-store">
-                        @if(!$iosUrl || $iosUrl === '#')
-                            Sắp ra mắt
-                        @else
-                            App Store
-                        @endif
-                    </span>
-                    <span class="app-dl-btn-label">{{ $iosLabel }}</span>
-                </div>
-            </a>
+
+            {{-- NÚT IOS: hướng dẫn "Add to Home Screen" --}}
+            @if($iosUrl && $iosUrl !== '#')
+                <a href="{{ $iosUrl }}" class="app-dl-btn app-dl-btn--ios"
+                   target="_blank" rel="noopener">
+                    @if($iosIcon)
+                        <img src="{{ asset($iosIcon) }}" class="app-dl-btn-icon" alt="">
+                    @else
+                        <span class="app-dl-btn-emoji">🍎</span>
+                    @endif
+                    <div class="app-dl-btn-text">
+                        <span class="app-dl-btn-store">App Store</span>
+                        <span class="app-dl-btn-label">{{ $iosLabel }}</span>
+                    </div>
+                </a>
+            @else
+                <button type="button" class="app-dl-btn app-dl-btn--ios"
+                        onclick="showIosGuide()">
+                    @if($iosIcon)
+                        <img src="{{ asset($iosIcon) }}" class="app-dl-btn-icon" alt="">
+                    @else
+                        <span class="app-dl-btn-emoji">🍎</span>
+                    @endif
+                    <div class="app-dl-btn-text">
+                        <span class="app-dl-btn-store">iPhone / iPad</span>
+                        <span class="app-dl-btn-label">{{ $iosLabel }}</span>
+                    </div>
+                </button>
+            @endif
+
         </div>
 
-        <!-- Close button — thu nhỏ thành floating pill -->
+        {{-- Thu gọn --}}
         <button class="app-banner-close" onclick="collapseAppBanner()" aria-label="Thu gọn">
             <i class="bi bi-chevron-up"></i>
         </button>
     </div>
 </div>
 
-{{-- ═══════════════════════════════════════ --}}
-{{-- FLOATING PILL — hiện sau khi thu gọn  --}}
-{{-- ═══════════════════════════════════════ --}}
-<div class="app-floating-pill" id="app-floating-pill" onclick="expandAppBanner()" title="Tải App {{ $bannerTitle }}">
+{{-- ═══════════════ FLOATING PILL ═══════════════ --}}
+<div class="app-floating-pill" id="app-floating-pill" onclick="expandAppBanner()">
     <div class="app-pill-icon">📱</div>
     <div class="app-pill-text">
-        <span class="app-pill-label">Tải App</span>
-        <span class="app-pill-stores">Android &amp; iOS</span>
+        <span class="app-pill-label">Cài App</span>
+        <span class="app-pill-stores">Miễn phí</span>
     </div>
-    <div class="app-pill-arrow">
-        <i class="bi bi-chevron-down" style="font-size: 0.7rem;"></i>
+    <div class="app-pill-arrow"><i class="bi bi-chevron-down" style="font-size:0.7rem"></i></div>
+</div>
+
+{{-- ═══════════════ IOS GUIDE MODAL ═══════════════ --}}
+<div class="ios-guide-overlay" id="ios-guide-overlay" onclick="closeIosGuide()">
+    <div class="ios-guide-card" onclick="event.stopPropagation()">
+        <button class="ios-guide-close" onclick="closeIosGuide()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="ios-guide-header">
+            <span style="font-size:2.5rem">🍎</span>
+            <div>
+                <div class="ios-guide-title">Cài App trên iPhone / iPad</div>
+                <div class="ios-guide-sub">Không cần App Store, hoàn toàn miễn phí</div>
+            </div>
+        </div>
+        <div class="ios-guide-steps">
+            <div class="ios-step">
+                <div class="ios-step-num">1</div>
+                <div class="ios-step-text">
+                    Mở trang này bằng <strong>Safari</strong>
+                    <span class="ios-step-note">Không dùng Chrome hay Firefox</span>
+                </div>
+            </div>
+            <div class="ios-step">
+                <div class="ios-step-num">2</div>
+                <div class="ios-step-text">
+                    Bấm nút <strong>Chia sẻ</strong> <span style="font-size:1.1rem">⬆️</span> ở thanh dưới Safari
+                    <span class="ios-step-note">Biểu tượng hình vuông có mũi tên đi lên</span>
+                </div>
+            </div>
+            <div class="ios-step">
+                <div class="ios-step-num">3</div>
+                <div class="ios-step-text">
+                    Chọn <strong>"Thêm vào Màn hình chính"</strong>
+                    <span class="ios-step-note">Add to Home Screen</span>
+                </div>
+            </div>
+            <div class="ios-step">
+                <div class="ios-step-num">4</div>
+                <div class="ios-step-text">
+                    Bấm <strong>Thêm</strong> để xác nhận
+                    <span class="ios-step-note">App sẽ xuất hiện trên màn hình chính như app thật</span>
+                </div>
+            </div>
+        </div>
+        <button class="ios-guide-done" onclick="closeIosGuide()">
+            <i class="bi bi-check-circle"></i> Đã hiểu, đóng lại
+        </button>
     </div>
 </div>
 
 <style>
-/* ─── BANNER ──────────────────────────────────────── */
+/* ─── BANNER BASE ──────────────────────────────────── */
 .app-download-banner {
-    background: linear-gradient(135deg, rgba(6,182,212,0.08) 0%, rgba(16,185,129,0.06) 50%, rgba(99,102,241,0.06) 100%);
+    background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(16,185,129,0.05), rgba(99,102,241,0.06));
     border: 1px solid rgba(6,182,212,0.2);
     border-radius: 20px;
     margin-bottom: 1.5rem;
     overflow: hidden;
     position: relative;
     animation: bannerFadeIn 0.5s ease;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes bannerFadeIn {
@@ -126,49 +174,29 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Shimmer overlay */
-.app-download-banner::before {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-    animation: bannerShimmer 4s ease infinite;
-}
-
-@keyframes bannerShimmer {
-    0%   { left: -100%; }
-    50%  { left: 100%; }
-    100% { left: 100%; }
-}
-
 .app-banner-inner {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1.25rem 1.5rem 1.25rem 1.5rem;
+    padding: 1.25rem 3.5rem 1.25rem 1.5rem; /* padding-right chừa chỗ nút close */
     flex-wrap: nowrap;
 }
 
 .app-banner-text {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.85rem;
     flex: 1;
-    min-width: 200px;
+    min-width: 0;
 }
 
 .app-banner-icon-wrap {
-    width: 48px;
-    height: 48px;
+    width: 46px; height: 46px;
     background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(16,185,129,0.2));
     border: 1px solid rgba(6,182,212,0.3);
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
+    border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
     flex-shrink: 0;
     animation: iconPulse 3s ease infinite;
 }
@@ -178,383 +206,370 @@
     50%       { transform: scale(1.08); }
 }
 
-.app-banner-subtitle {
-    font-size: 0.78rem;
-    color: #9ca3af;
-    margin-bottom: 0.2rem;
-}
-
+.app-banner-subtitle { font-size: 0.76rem; color: #9ca3af; margin-bottom: 0.15rem; white-space: nowrap; }
 .app-banner-title {
-    font-size: 1.05rem;
-    font-weight: 800;
+    font-size: 1rem; font-weight: 800;
     background: linear-gradient(135deg, #22d3ee, #34d399);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    white-space: nowrap;
 }
 
-/* ─── DOWNLOAD BUTTONS ───────────────────────────── */
+/* ─── DOWNLOAD BUTTONS ─────────────────────────────── */
 .app-banner-buttons {
     display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
+    gap: 0.65rem;
+    flex-shrink: 0;
 }
 
 .app-dl-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.6rem 1.1rem;
+    gap: 0.55rem;
+    padding: 0.6rem 1rem;
     border-radius: 12px;
     text-decoration: none;
     font-family: 'Inter', sans-serif;
+    border: none;
+    cursor: pointer;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 148px;
     position: relative;
     overflow: hidden;
-    min-width: 155px;
 }
 
-.app-dl-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.25s;
-    background: rgba(255,255,255,0.1);
-}
-
-.app-dl-btn:hover::before { opacity: 1; }
 .app-dl-btn:hover { transform: translateY(-3px); }
-.app-dl-btn:active { transform: translateY(-1px); }
+.app-dl-btn:active { transform: scale(0.97); }
 
 .app-dl-btn--android {
     background: linear-gradient(135deg, #1a9450, #3ddc84);
     color: white;
-    box-shadow: 0 4px 20px rgba(61,220,132,0.3);
+    box-shadow: 0 4px 18px rgba(61,220,132,0.35);
 }
-.app-dl-btn--android:hover { box-shadow: 0 8px 30px rgba(61,220,132,0.45); color: white; }
+.app-dl-btn--android:hover { box-shadow: 0 8px 28px rgba(61,220,132,0.5); color: white; }
 
 .app-dl-btn--ios {
     background: linear-gradient(135deg, #1c1c1e, #3a3a3c);
     color: white;
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.3);
 }
-.app-dl-btn--ios:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.45); color: white; }
+.app-dl-btn--ios:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.5); color: white; }
 
-.app-dl-btn-icon {
-    width: 30px; height: 30px;
-    border-radius: 7px;
-    object-fit: contain;
-    flex-shrink: 0;
-    background: rgba(255,255,255,0.1);
-}
+.app-dl-btn-icon { width: 28px; height: 28px; border-radius: 6px; object-fit: contain; flex-shrink: 0; }
+.app-dl-btn-emoji { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
+.app-dl-btn-text { display: flex; flex-direction: column; line-height: 1.25; text-align: left; }
+.app-dl-btn-store { font-size: 0.62rem; opacity: 0.75; }
+.app-dl-btn-label { font-size: 0.8rem; font-weight: 700; }
 
-.app-dl-btn-emoji { font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
-
-.app-dl-btn-text { display: flex; flex-direction: column; line-height: 1.2; }
-.app-dl-btn-store { font-size: 0.65rem; opacity: 0.75; letter-spacing: 0.3px; }
-.app-dl-btn-label { font-size: 0.82rem; font-weight: 700; }
-
-/* ─── CLOSE (COLLAPSE) BUTTON ───────────────────── */
+/* ─── CLOSE BUTTON ─────────────────────────────────── */
 .app-banner-close {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: #9ca3af;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    transition: all 0.2s;
+    position: absolute; top: 0.7rem; right: 0.8rem;
+}
+.app-banner-close:hover { background: rgba(6,182,212,0.15); border-color: rgba(6,182,212,0.4); color: #22d3ee; }
+
+/* ─── FLOATING PILL ────────────────────────────────── */
+.app-floating-pill {
+    display: none;
+    position: fixed;
+    bottom: 90px; right: 16px;
+    z-index: 2100;
+    align-items: center;
+    gap: 0.45rem;
+    background: linear-gradient(135deg, rgba(6,182,212,0.95), rgba(16,185,129,0.9));
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    padding: 0.5rem 0.85rem 0.5rem 0.6rem;
+    cursor: pointer;
+    box-shadow: 0 6px 28px rgba(6,182,212,0.45), 0 2px 8px rgba(0,0,0,0.3);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    user-select: none;
+    white-space: nowrap;
+}
+.app-floating-pill.visible { display: flex; animation: pillPop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.app-floating-pill:hover   { transform: translateY(-4px) scale(1.04); box-shadow: 0 12px 36px rgba(6,182,212,0.6); }
+
+@keyframes pillPop {
+    from { transform: scale(0.5) translateY(20px); opacity: 0; }
+    to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+.app-pill-icon  { font-size: 1.2rem; }
+.app-pill-text  { display: flex; flex-direction: column; line-height: 1.15; }
+.app-pill-label { font-size: 0.7rem; font-weight: 800; color: white; }
+.app-pill-stores{ font-size: 0.58rem; color: rgba(255,255,255,0.75); }
+.app-pill-arrow { width: 18px; height: 18px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-left: 2px; }
+
+@media (min-width: 769px) {
+    .app-floating-pill { bottom: 28px; right: 28px; }
+}
+
+/* ─── iOS GUIDE MODAL ──────────────────────────────── */
+.ios-guide-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 1rem;
+}
+.ios-guide-overlay.open { display: flex; }
+
+.ios-guide-card {
+    background: linear-gradient(160deg, #1f2937, #111827);
+    border: 1px solid rgba(6,182,212,0.25);
+    border-radius: 24px 24px 20px 20px;
+    padding: 1.75rem 1.5rem 1.5rem;
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    animation: guideSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes guideSlideUp {
+    from { transform: translateY(100px); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+}
+
+.ios-guide-close {
+    position: absolute; top: 1rem; right: 1rem;
     width: 30px; height: 30px;
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.05);
     color: #9ca3af;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-size: 0.75rem;
     transition: all 0.2s;
-    flex-shrink: 0;
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
 }
-.app-banner-close:hover {
-    background: rgba(6,182,212,0.15);
-    border-color: rgba(6,182,212,0.4);
-    color: #22d3ee;
-}
+.ios-guide-close:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
 
-/* ─── FLOATING PILL ──────────────────────────────── */
-.app-floating-pill {
-    display: none; /* hidden by default, shown after collapse */
-    position: fixed;
-    bottom: 90px;   /* above mobile bottom nav */
-    right: 18px;
-    z-index: 1500;
-    align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg, rgba(6,182,212,0.95), rgba(16,185,129,0.9));
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 50px;
-    padding: 0.55rem 1rem 0.55rem 0.65rem;
-    cursor: pointer;
-    box-shadow: 0 6px 30px rgba(6,182,212,0.45), 0 2px 8px rgba(0,0,0,0.3);
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    user-select: none;
-    animation: pillPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-    min-width: 0;
-    max-width: 200px;
-    overflow: hidden;
-    white-space: nowrap;
+.ios-guide-header {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-right: 2rem;
 }
+.ios-guide-title { font-size: 1.1rem; font-weight: 800; color: #f9fafb; margin-bottom: 0.2rem; }
+.ios-guide-sub   { font-size: 0.78rem; color: #9ca3af; }
 
-.app-floating-pill.visible {
+.ios-guide-steps { display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem; }
+
+.ios-step {
     display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
 }
 
-@keyframes pillPop {
-    from { transform: scale(0.5) translateY(20px); opacity: 0; }
-    to   { transform: scale(1) translateY(0);      opacity: 1; }
-}
-
-.app-floating-pill:hover {
-    transform: translateY(-4px) scale(1.04);
-    box-shadow: 0 12px 40px rgba(6,182,212,0.6), 0 4px 12px rgba(0,0,0,0.3);
-}
-
-.app-floating-pill:active {
-    transform: scale(0.97);
-}
-
-.app-pill-icon {
-    font-size: 1.25rem;
-    line-height: 1;
-    flex-shrink: 0;
-    animation: iconPulse 2s ease infinite;
-}
-
-.app-pill-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-    flex: 1;
-}
-
-.app-pill-label {
-    font-size: 0.72rem;
-    font-weight: 800;
-    color: white;
-    letter-spacing: 0.3px;
-}
-
-.app-pill-stores {
-    font-size: 0.6rem;
-    color: rgba(255,255,255,0.75);
-}
-
-.app-pill-arrow {
-    width: 20px; height: 20px;
-    background: rgba(255,255,255,0.2);
+.ios-step-num {
+    width: 28px; height: 28px; min-width: 28px;
+    background: linear-gradient(135deg, #06b6d4, #10b981);
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 800; color: white;
+}
+
+.ios-step-text {
+    font-size: 0.87rem;
+    color: #e5e7eb;
+    line-height: 1.4;
+}
+.ios-step-note {
+    display: block;
+    font-size: 0.72rem;
+    color: #9ca3af;
+    margin-top: 0.2rem;
+}
+
+.ios-guide-done {
+    width: 100%;
+    padding: 0.85rem;
+    background: linear-gradient(135deg, #06b6d4, #10b981);
     color: white;
-    flex-shrink: 0;
-    margin-left: 0.1rem;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    transition: all 0.2s;
 }
+.ios-guide-done:hover { opacity: 0.9; transform: translateY(-1px); }
 
-/* Desktop: pill ở góc dưới bên phải, không cần offset nav */
-@media (min-width: 769px) {
-    .app-floating-pill {
-        bottom: 28px;
-        right: 28px;
-    }
-}
-
-/* ─── MOBILE RESPONSIVE ──────────────────────────── */
+/* ─── MOBILE ───────────────────────────────────────── */
 @media (max-width: 768px) {
-    .app-download-banner {
-        border-radius: 14px;
-        margin-bottom: 1rem;
-    }
+    .app-download-banner { border-radius: 14px; margin-bottom: 1rem; }
 
-    /* Ẩn shimmer trên mobile cho nhẹ */
-    .app-download-banner::before { display: none; }
-
-    /* Layout dọc trên mobile */
     .app-banner-inner {
         flex-direction: column;
         align-items: stretch;
-        gap: 0.75rem;
-        padding: 0.9rem 0.9rem 0.9rem 0.9rem;
-        padding-right: 2.5rem; /* chừa chỗ cho nút close */
+        gap: 0.7rem;
+        padding: 0.85rem 0.9rem;
+        padding-right: 2.75rem;
     }
 
-    /* Hàng trên: icon + text ngang nhau */
-    .app-banner-text {
-        flex-direction: row;
-        align-items: center;
-        gap: 0.65rem;
-        min-width: 0;
-        flex: none;
-    }
+    .app-banner-text  { flex-direction: row; align-items: center; gap: 0.6rem; }
+    .app-banner-icon-wrap { width: 36px; height: 36px; font-size: 1.1rem; }
+    .app-banner-title   { font-size: 0.85rem; }
+    .app-banner-subtitle{ font-size: 0.7rem;  }
 
-    .app-banner-icon-wrap {
-        width: 38px;
-        height: 38px;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-    }
-
-    .app-banner-title { font-size: 0.88rem; }
-    .app-banner-subtitle { font-size: 0.72rem; }
-
-    /* Hàng dưới: 2 nút tải cạnh nhau, chiếm full width */
     .app-banner-buttons {
         display: grid !important;
         grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
+        gap: 0.45rem;
         width: 100%;
     }
 
     .app-dl-btn {
         min-width: 0;
-        padding: 0.5rem 0.65rem;
+        padding: 0.5rem 0.6rem;
         border-radius: 10px;
-        gap: 0.45rem;
         justify-content: center;
+        gap: 0.4rem;
     }
 
-    .app-dl-btn-emoji  { font-size: 1.2rem; }
-    .app-dl-btn-icon   { width: 24px; height: 24px; }
-    .app-dl-btn-store  { font-size: 0.6rem; }
-    .app-dl-btn-label  { font-size: 0.72rem; }
+    .app-dl-btn-emoji { font-size: 1.15rem; }
+    .app-dl-btn-icon  { width: 22px; height: 22px; }
+    .app-dl-btn-store { font-size: 0.58rem; }
+    .app-dl-btn-label { font-size: 0.7rem; }
 
-    /* Close button góc trên phải, không che nội dung */
-    .app-banner-close {
-        top: 0.6rem;
-        right: 0.6rem;
-        width: 26px;
-        height: 26px;
-        font-size: 0.65rem;
-    }
+    .app-banner-close { top: 0.55rem; right: 0.6rem; width: 24px; height: 24px; font-size: 0.62rem; }
 }
 </style>
 
 <script>
 (function() {
-    // ── Thu gọn banner → show floating pill ──
+    // ── Thu gọn ──
     window.collapseAppBanner = function() {
         const banner = document.getElementById('app-download-banner');
         const pill   = document.getElementById('app-floating-pill');
         if (!banner) return;
 
-        banner.style.transition = 'max-height 0.4s ease, opacity 0.3s ease, margin 0.4s ease';
-        banner.style.maxHeight  = banner.scrollHeight + 'px';
-        banner.style.overflow   = 'hidden';
+        banner.style.transition  = 'max-height 0.4s ease, opacity 0.3s ease, margin 0.4s ease';
+        banner.style.maxHeight   = banner.scrollHeight + 'px';
+        banner.style.overflow    = 'hidden';
         requestAnimationFrame(() => {
             banner.style.maxHeight    = '0';
             banner.style.opacity      = '0';
             banner.style.marginBottom = '0';
         });
-
         setTimeout(() => {
             banner.style.display = 'none';
             if (pill) pill.classList.add('visible');
         }, 420);
-
         try { sessionStorage.setItem('app_banner_state', 'collapsed'); } catch(e) {}
     };
 
-    // ── Bấm pill → show lại banner, ẩn pill ──
+    // ── Mở lại ──
     window.expandAppBanner = function() {
         const banner = document.getElementById('app-download-banner');
         const pill   = document.getElementById('app-floating-pill');
         if (!banner) return;
 
         if (pill) pill.classList.remove('visible');
-
         banner.style.display      = 'block';
         banner.style.maxHeight    = '0';
         banner.style.opacity      = '0';
         banner.style.overflow     = 'hidden';
         banner.style.marginBottom = '0';
         banner.style.transition   = 'max-height 0.4s ease, opacity 0.3s ease, margin 0.4s ease';
-
         requestAnimationFrame(() => {
-            banner.style.maxHeight    = '300px';
+            banner.style.maxHeight    = '400px';
             banner.style.opacity      = '1';
             banner.style.marginBottom = '1.5rem';
         });
-
-        setTimeout(() => {
-            banner.style.maxHeight = 'none';
-            banner.style.overflow  = '';
-        }, 420);
-
+        setTimeout(() => { banner.style.maxHeight = 'none'; banner.style.overflow = ''; }, 420);
         try { sessionStorage.setItem('app_banner_state', 'open'); } catch(e) {}
     };
 
-    // ── Hiện thông báo "Sắp ra mắt" khi link chưa có ──
-    window.appDlNotReady = function(platform) {
-        // Tạo popup mini
-        const existing = document.getElementById('app-coming-soon-popup');
+    // ── Trigger PWA install (Android/Chrome) ──
+    window.triggerPwaInstall = function(platform) {
+        if (window.isPWAInstallable && window.isPWAInstallable()) {
+            window.installPWA();
+        } else {
+            // Nếu chưa ready hoặc iOS → hiện hướng dẫn
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                showIosGuide();
+            } else {
+                // Android nhưng chưa có prompt → nhắc dùng Chrome
+                showGenericGuide();
+            }
+        }
+    };
+
+    // ── iOS: hiện modal hướng dẫn ──
+    window.showIosGuide = function() {
+        const overlay = document.getElementById('ios-guide-overlay');
+        if (overlay) overlay.classList.add('open');
+    };
+
+    window.closeIosGuide = function() {
+        const overlay = document.getElementById('ios-guide-overlay');
+        if (overlay) overlay.classList.remove('open');
+    };
+
+    // ── Generic guide (desktop hoặc trình duyệt không hỗ trợ) ──
+    window.showGenericGuide = function() {
+        const existing = document.getElementById('app-generic-popup');
         if (existing) existing.remove();
 
         const popup = document.createElement('div');
-        popup.id = 'app-coming-soon-popup';
+        popup.id = 'app-generic-popup';
         popup.style.cssText = `
-            position: fixed;
-            bottom: 110px;
-            left: 50%;
+            position: fixed; bottom: 110px; left: 50%;
             transform: translateX(-50%) translateY(20px);
             background: linear-gradient(135deg, #1f2937, #111827);
             border: 1px solid rgba(6,182,212,0.4);
-            border-radius: 16px;
-            padding: 1rem 1.5rem;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(6,182,212,0.1);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-family: 'Inter', sans-serif;
-            min-width: 240px;
-            max-width: 320px;
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            text-align: left;
+            border-radius: 16px; padding: 1rem 1.25rem;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+            z-index: 9999; display: flex; align-items: center; gap: 0.75rem;
+            font-family: 'Inter', sans-serif; min-width: 240px; max-width: 300px;
+            opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         `;
-
-        const icon = platform === 'Android' ? '🤖' : '🍎';
         popup.innerHTML = `
-            <span style="font-size:2rem;line-height:1">${icon}</span>
+            <span style="font-size:2rem">💡</span>
             <div>
-                <div style="font-weight:700;font-size:0.9rem;color:#f9fafb;margin-bottom:0.2rem">
-                    App ${platform} sắp ra mắt!
+                <div style="font-weight:700;font-size:0.88rem;color:#f9fafb;margin-bottom:0.2rem">
+                    Mở bằng Chrome để cài app
                 </div>
-                <div style="font-size:0.78rem;color:#9ca3af;line-height:1.4">
-                    Chúng tôi đang hoàn thiện ứng dụng.<br>Vui lòng quay lại sau nhé 🙏
+                <div style="font-size:0.75rem;color:#9ca3af;line-height:1.4">
+                    Trên Android: dùng Chrome → menu ⋮ → "Thêm vào màn hình chính"
                 </div>
             </div>
         `;
-
         document.body.appendChild(popup);
-
-        // Animate in
-        requestAnimationFrame(() => {
-            popup.style.opacity   = '1';
-            popup.style.transform = 'translateX(-50%) translateY(0)';
-        });
-
-        // Auto dismiss sau 3s
+        requestAnimationFrame(() => { popup.style.opacity = '1'; popup.style.transform = 'translateX(-50%) translateY(0)'; });
         setTimeout(() => {
-            popup.style.opacity   = '0';
-            popup.style.transform = 'translateX(-50%) translateY(10px)';
+            popup.style.opacity = '0';
             setTimeout(() => popup.remove(), 300);
-        }, 3000);
+        }, 4000);
     };
 
-    // ── Khôi phục trạng thái khi tải trang ──
+    // ── Khi PWA installable: cập nhật label nút Android ──
+    document.addEventListener('pwa-installable', function() {
+        const label = document.getElementById('android-store-label');
+        if (label) label.textContent = '1 click cài ngay';
+    });
+
+    // ── Khôi phục trạng thái ──
     document.addEventListener('DOMContentLoaded', function() {
         try {
-            const state = sessionStorage.getItem('app_banner_state');
-            if (state === 'collapsed') {
+            if (sessionStorage.getItem('app_banner_state') === 'collapsed') {
                 const banner = document.getElementById('app-download-banner');
                 const pill   = document.getElementById('app-floating-pill');
                 if (banner) banner.style.display = 'none';

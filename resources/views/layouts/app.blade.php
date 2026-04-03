@@ -21,6 +21,16 @@
     <link rel="shortcut icon" href="{{ asset('av.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('av.png') }}">
 
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AquaHub">
+    <meta name="application-name" content="AquaHub">
+    <meta name="msapplication-TileColor" content="#06b6d4">
+    <meta name="msapplication-TileImage" content="{{ asset('av.png') }}">
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="AquaHub Pro">
@@ -1393,5 +1403,53 @@
     </script>
 
     @stack('scripts')
+
+    <!-- ═══ PWA: Service Worker + Install Prompt ═══ -->
+    <script>
+    // ── Đăng ký Service Worker ──
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+    }
+
+    // ── Bắt sự kiện install prompt (Chrome Android) ──
+    let _pwaInstallPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        _pwaInstallPrompt = e;
+        // Thông báo cho banner biết có thể cài
+        document.dispatchEvent(new CustomEvent('pwa-installable'));
+    });
+
+    // Hàm gọi từ banner khi bấm "Cài App"
+    window.installPWA = function() {
+        if (_pwaInstallPrompt) {
+            _pwaInstallPrompt.prompt();
+            _pwaInstallPrompt.userChoice.then(result => {
+                if (result.outcome === 'accepted') {
+                    document.dispatchEvent(new CustomEvent('pwa-installed'));
+                }
+                _pwaInstallPrompt = null;
+            });
+        } else {
+            // Fallback: hiện hướng dẫn iOS hoặc trình duyệt khác
+            window.showPwaGuide && window.showPwaGuide();
+        }
+    };
+
+    window.isPWAInstallable = function() {
+        return !!_pwaInstallPrompt;
+    };
+
+    // Ẩn banner nút cài sau khi đã cài thành công
+    window.addEventListener('appinstalled', () => {
+        const banner = document.getElementById('app-download-banner');
+        const pill   = document.getElementById('app-floating-pill');
+        if (banner) banner.style.display = 'none';
+        if (pill)   pill.classList.remove('visible');
+    });
+    </script>
 </body>
 </html>
