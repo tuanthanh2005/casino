@@ -34,30 +34,30 @@
             <button type="button" class="app-dl-btn app-dl-btn--desktop" onclick="triggerPwaInstall('desktop')">
                 <span class="app-dl-btn-emoji">🖥️</span>
                 <div class="app-dl-btn-text">
-                    <span class="app-dl-btn-store">Desktop app</span>
-                    <span class="app-dl-btn-label">Cài Desktop</span>
+                    <span class="app-dl-btn-store">PC / Laptop</span>
+                    <span class="app-dl-btn-label">Cài cho Desktop</span>
                 </div>
             </button>
 
             {{-- NÚT ANDROID: luôn hiển thị để đủ 3 nút --}}
             @if($androidUrl && $androidUrl !== '#')
-                <a href="{{ $androidUrl }}" class="app-dl-btn app-dl-btn--android" target="_blank" rel="noopener">
+                <button type="button" class="app-dl-btn app-dl-btn--android" onclick='triggerAndroidInstall(@json($androidUrl))'>
                     @if($androidIcon)
                         <img src="{{ asset($androidIcon) }}" class="app-dl-btn-icon" alt="">
                     @else
                         <span class="app-dl-btn-emoji">🤖</span>
                     @endif
                     <div class="app-dl-btn-text">
-                        <span class="app-dl-btn-store">Android APK</span>
+                        <span class="app-dl-btn-store">Android</span>
                         <span class="app-dl-btn-label">Tải Android</span>
                     </div>
-                </a>
+                </button>
             @else
                 <button type="button" class="app-dl-btn app-dl-btn--android" onclick="triggerAndroidInstall()">
                     <span class="app-dl-btn-emoji">🤖</span>
                     <div class="app-dl-btn-text">
-                        <span class="app-dl-btn-store">Android app</span>
-                        <span class="app-dl-btn-label">Tải Android</span>
+                        <span class="app-dl-btn-store">Android</span>
+                        <span class="app-dl-btn-label">Cài trên Android</span>
                     </div>
                 </button>
             @endif
@@ -71,8 +71,8 @@
                         <span class="app-dl-btn-emoji">🍎</span>
                     @endif
                     <div class="app-dl-btn-text">
-                        <span class="app-dl-btn-store">App Store</span>
-                        <span class="app-dl-btn-label">{{ $iosLabel }}</span>
+                        <span class="app-dl-btn-store">iPhone / iPad</span>
+                        <span class="app-dl-btn-label">Tải cho iOS</span>
                     </div>
                 </a>
             @else
@@ -84,7 +84,7 @@
                     @endif
                     <div class="app-dl-btn-text">
                         <span class="app-dl-btn-store">iPhone / iPad</span>
-                        <span class="app-dl-btn-label">{{ $iosLabel }}</span>
+                        <span class="app-dl-btn-label">Tải cho iOS</span>
                     </div>
                 </button>
             @endif
@@ -325,33 +325,39 @@
 
     /* ─── DOWNLOAD BUTTONS ─────────────────────────────── */
     .app-banner-buttons {
-        display: flex;
-        gap: 0.65rem;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(165px, 1fr));
+        gap: 0.7rem;
         flex-shrink: 0;
+        width: min(100%, 590px);
     }
 
     .app-dl-btn {
         display: inline-flex;
         align-items: center;
+        justify-content: flex-start;
         gap: 0.55rem;
-        padding: 0.6rem 1rem;
+        padding: 0.65rem 0.9rem;
         border-radius: 12px;
         text-decoration: none;
         font-family: 'Inter', sans-serif;
-        border: none;
+        border: 1px solid rgba(255, 255, 255, 0.16);
         cursor: pointer;
-        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        min-width: 148px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        min-width: 0;
+        min-height: 58px;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
     }
 
     .app-dl-btn:hover {
-        transform: translateY(-3px);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3);
     }
 
     .app-dl-btn--android {
-        background: linear-gradient(135deg, #1a9450, #3ddc84);
+        background: linear-gradient(135deg, #0f9f5d, #34d399);
         color: white;
     }
 
@@ -361,9 +367,9 @@
     }
 
     .app-dl-btn--ios {
-        background: linear-gradient(135deg, #1c1c1e, #3a3a3c);
+        background: linear-gradient(135deg, #20222a, #3f4452);
         color: white;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.14);
     }
 
     .app-dl-btn-icon {
@@ -385,16 +391,22 @@
         flex-direction: column;
         line-height: 1.25;
         text-align: left;
+        min-width: 0;
     }
 
     .app-dl-btn-store {
-        font-size: 0.62rem;
-        opacity: 0.75;
+        font-size: 0.63rem;
+        opacity: 0.86;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
 
     .app-dl-btn-label {
-        font-size: 0.8rem;
+        font-size: 0.86rem;
         font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* ─── CLOSE BUTTON ─────────────────────────────────── */
@@ -524,7 +536,12 @@
 
         .app-dl-btn {
             min-width: 0;
-            padding: 0.55rem 0.6rem;
+            min-height: 56px;
+            padding: 0.55rem 0.75rem;
+        }
+
+        .app-dl-btn-label {
+            font-size: 0.82rem;
         }
     }
 </style>
@@ -591,7 +608,15 @@
             document.getElementById('android-guide-overlay')?.classList.add('open');
         };
 
-        window.triggerAndroidInstall = function () {
+        window.triggerAndroidInstall = function (downloadUrl = null) {
+            const accepted = confirm('Bạn có muốn tải Android ngay bây giờ không?');
+            if (!accepted) return;
+
+            if (downloadUrl && downloadUrl !== '#') {
+                window.location.assign(downloadUrl);
+                return;
+            }
+
             if (isAndroidDevice()) {
                 if (window.installPWA) {
                     window.installPWA();
