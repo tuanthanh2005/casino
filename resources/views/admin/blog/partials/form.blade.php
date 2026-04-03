@@ -10,7 +10,7 @@
             </div>
         @endif
 
-        <form action="{{ $action }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ $action }}" method="POST" enctype="multipart/form-data" novalidate>
             @csrf
             @if($method !== 'POST')
                 @method($method)
@@ -48,7 +48,7 @@
 
             <div class="mb-3">
                 <label class="form-label-admin">Nội dung bài viết <span style="color:var(--danger)">*</span></label>
-                <textarea id="blog-content-editor" name="content" rows="15" class="form-control" required placeholder="Viết nội dung chi tiết...">{{ old('content', $post->content ?? '') }}</textarea>
+                <textarea id="blog-content-editor" name="content" rows="15" class="form-control" placeholder="Viết nội dung chi tiết...">{{ old('content', $post->content ?? '') }}</textarea>
                 <small style="display:block; margin-top:0.45rem; color:var(--text-muted); font-size:0.78rem;">
                     Có thể dùng tiêu đề, đậm/nghiêng, danh sách, link, blockquote, bảng và chèn ảnh bằng URL.
                 </small>
@@ -136,6 +136,53 @@
             table: {
                 contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
             }
+        }).then(function (editor) {
+            const form = editorElement.closest('form');
+
+            if (!form) {
+                return;
+            }
+
+            form.addEventListener('submit', function (event) {
+                const titleInput = form.querySelector('input[name="title"]');
+                const titleValue = (titleInput ? titleInput.value : '').trim();
+                const rawHtml = editor.getData() || '';
+                const plainText = rawHtml
+                    .replace(/<[^>]+>/g, ' ')
+                    .replace(/&nbsp;/g, ' ')
+                    .trim();
+
+                if (!titleValue.length) {
+                    event.preventDefault();
+
+                    if (typeof showToast === 'function') {
+                        showToast('Vui lòng nhập tiêu đề bài viết.', 'error');
+                    } else {
+                        alert('Vui lòng nhập tiêu đề bài viết.');
+                    }
+
+                    if (titleInput) {
+                        titleInput.focus();
+                    }
+
+                    return;
+                }
+
+                if (!plainText.length) {
+                    event.preventDefault();
+
+                    if (typeof showToast === 'function') {
+                        showToast('Vui lòng nhập nội dung bài viết.', 'error');
+                    } else {
+                        alert('Vui lòng nhập nội dung bài viết.');
+                    }
+
+                    editor.editing.view.focus();
+                    return;
+                }
+
+                editor.updateSourceElement();
+            });
         }).catch(function (error) {
             console.error('CKEditor init failed:', error);
         });
