@@ -153,6 +153,16 @@
     .profile-modal-body {
         padding: 1.5rem;
     }
+    .notif-item {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0.75rem;
+        background: rgba(99,102,241,0.05);
+    }
+    .notif-item.unread {
+        border-color: rgba(16,185,129,0.45);
+        background: rgba(16,185,129,0.08);
+    }
     .btn-close-modal {
         background: var(--bg-body);
         color: var(--text-muted);
@@ -213,6 +223,38 @@
         }
         .btn-nav-logout:hover {
             background: rgba(239,68,68,0.1);
+        }
+
+        .notif-btn {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: rgba(17,24,39,0.9);
+            color: var(--text);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 0.3rem;
+            border: 2px solid var(--bg);
         }
 
         .nav-container {
@@ -631,6 +673,11 @@
                 font-weight: 700;
                 color: var(--accent);
             }
+            .mobile-header-actions {
+                display: flex;
+                align-items: center;
+                gap: 0.45rem;
+            }
             .mobile-logo {
                 font-weight: 900;
                 font-size: 1.1rem;
@@ -752,7 +799,11 @@
     @auth
     <div class="mobile-header">
         <div class="mobile-logo">🌊 AquaHub</div>
-        <div style="display:flex; align-items:center; gap:0.6rem">
+        <div class="mobile-header-actions">
+            <button type="button" class="notif-btn" onclick="openNotificationModal()" aria-label="Thông báo">
+                <i class="bi bi-bell"></i>
+                <span class="notif-badge" id="notif-badge-mobile" style="display:none">0</span>
+            </button>
             <div class="mobile-status">
                 <i class="bi bi-coin"></i>
                 <span id="m-nav-balance">{{ number_format((float) auth()->user()->balance_point, 0) }}</span>
@@ -870,6 +921,10 @@
                     <i class="bi bi-coin"></i>
                     <span id="nav-balance">{{ number_format((float) auth()->user()->balance_point, 2) }}</span> PT
                 </div>
+                <button type="button" class="notif-btn" onclick="openNotificationModal()" aria-label="Thông báo">
+                    <i class="bi bi-bell"></i>
+                    <span class="notif-badge" id="notif-badge-desktop" style="display:none">0</span>
+                </button>
                 <img class="avatar" src="{{ auth()->user()->avatar_url }}" alt="Avatar" onclick="openProfileModal()" style="cursor:pointer">
                 <form action="{{ route('logout') }}" method="POST" style="display:inline">
                     @csrf
@@ -1054,6 +1109,30 @@
             </div>
         </div>
     </div>
+
+    <!-- NOTIFICATION MODAL -->
+    <div class="profile-modal" id="notification-modal">
+        <div class="profile-modal-card">
+            <div class="profile-modal-header">
+                <div style="display:flex; align-items:center; gap:0.75rem">
+                    <span style="font-size:1.5rem">🔔</span>
+                    <div>
+                        <div style="font-weight:800; font-size:1.1rem">Thông báo hệ thống</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted)">Tin nhắn từ admin và cập nhật quan trọng</div>
+                    </div>
+                </div>
+                <button class="btn-close-modal" onclick="closeNotificationModal()"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="profile-modal-body">
+                <div style="display:flex; justify-content:flex-end; margin-bottom:0.75rem">
+                    <button type="button" class="btn btn-outline" onclick="markAllNotificationsRead()" id="btn-notif-read-all">
+                        <i class="bi bi-check2-all"></i> Đánh dấu đã đọc
+                    </button>
+                </div>
+                <div id="notif-list" style="display:grid; gap:0.6rem"></div>
+            </div>
+        </div>
+    </div>
     @endauth
 
     <script>
@@ -1124,6 +1203,103 @@
             document.getElementById('contact-modal').classList.remove('open');
         }
 
+        function setNotificationBadgeCount(unreadCount) {
+            ['notif-badge-desktop', 'notif-badge-mobile'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (!el) return;
+
+                if (unreadCount > 0) {
+                    el.style.display = 'inline-flex';
+                    el.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+                } else {
+                    el.style.display = 'none';
+                    el.textContent = '0';
+                }
+            });
+        }
+
+        function renderNotificationList(notifications) {
+            const listEl = document.getElementById('notif-list');
+            if (!listEl) return;
+
+            if (!Array.isArray(notifications) || notifications.length === 0) {
+                listEl.innerHTML = '<div class="notif-item"><div class="notif-title">Chưa có thông báo</div><div class="notif-meta">Khi admin gửi thông báo, bạn sẽ thấy tại đây.</div></div>';
+                return;
+            }
+
+            listEl.innerHTML = notifications.map(function(item) {
+                const readClass = item.is_read ? 'read' : '';
+                return `
+                    <div class="notif-item ${readClass}">
+                        <div class="notif-title">${escapeHtml(item.title || 'Thông báo')}</div>
+                        <div style="font-size:0.9rem; color:var(--text)">${escapeHtml(item.message || '')}</div>
+                        <div class="notif-meta">Từ ${escapeHtml(item.sender_name || 'Admin')} • ${escapeHtml(item.created_at || '')}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value == null ? '' : String(value);
+            return div.innerHTML;
+        }
+
+        async function fetchNotifications() {
+            try {
+                const resp = await fetch('{{ route("notifications.index") }}', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!resp.ok) return;
+
+                const data = await resp.json();
+                setNotificationBadgeCount(Number(data.unread_count || 0));
+                renderNotificationList(data.notifications || []);
+            } catch (_) {}
+        }
+
+        function openNotificationModal() {
+            document.getElementById('notification-modal')?.classList.add('open');
+            fetchNotifications();
+        }
+
+        function closeNotificationModal() {
+            document.getElementById('notification-modal')?.classList.remove('open');
+        }
+
+        async function markAllNotificationsRead() {
+            const btn = document.getElementById('btn-notif-read-all');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+            }
+
+            try {
+                const resp = await fetch('{{ route("notifications.read-all") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (resp.ok) {
+                    await fetchNotifications();
+                    showToast('Đã đánh dấu tất cả là đã đọc', 'success');
+                } else {
+                    showToast('Không thể cập nhật thông báo', 'error');
+                }
+            } catch (_) {
+                showToast('Lỗi kết nối máy chủ!', 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-check2-all"></i> Đánh dấu đã đọc';
+                }
+            }
+        }
+
         async function submitProfileUpdate() {
             const form = document.getElementById('profile-update-form');
             const btn  = document.getElementById('btn-profile-submit');
@@ -1166,9 +1342,13 @@
         document.getElementById('contact-modal')?.addEventListener('click', function(e) {
             if (e.target === this) closeContactModal();
         });
+        document.getElementById('notification-modal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeNotificationModal();
+        });
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeProfileModal();
             if (e.key === 'Escape') closeContactModal();
+            if (e.key === 'Escape') closeNotificationModal();
         });
 
         // Mobile bottom-nav loading indicator
@@ -1203,6 +1383,10 @@
         }
 
         initMobileNavLoader();
+        if (document.getElementById('notif-badge-desktop') || document.getElementById('notif-badge-mobile')) {
+            fetchNotifications();
+            setInterval(fetchNotifications, 60000);
+        }
     </script>
 
     @stack('scripts')

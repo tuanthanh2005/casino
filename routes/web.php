@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\RewardItemController;
 use App\Http\Controllers\Admin\FarmAdminController;
 use App\Http\Controllers\Admin\NavAdminController;
 use App\Http\Controllers\Admin\SupportChatAdminController;
+use App\Http\Controllers\Admin\SystemNotificationController as AdminSystemNotificationController;
+use App\Http\Controllers\SystemNotificationController;
 use App\Http\Controllers\SupportChatController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Admin\BlogPostController;
@@ -165,6 +167,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/support/chat/send', [SupportChatController::class, 'send'])->name('support.chat.send');
     Route::get('/support/chat/fetch', [SupportChatController::class, 'fetch'])->name('support.chat.fetch');
 
+    // 🔔 Thông báo hệ thống user
+    Route::get('/notifications', [SystemNotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [SystemNotificationController::class, 'markAllRead'])->name('notifications.read-all');
+
     // 🌾 Nông Trại
     Route::get('/farm',                     [FarmController::class, 'index'])->name('farm');
     Route::post('/farm/plant',              [FarmController::class, 'plant'])->name('farm.plant');
@@ -229,6 +235,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/support-chat', [SupportChatAdminController::class, 'index'])->name('support.chat');
     Route::post('/support-chat/send', [SupportChatAdminController::class, 'send'])->name('support.chat.send');
     Route::get('/support-chat/fetch/{user}', [SupportChatAdminController::class, 'fetch'])->name('support.chat.fetch');
+    Route::get('/notifications', [AdminSystemNotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications', [AdminSystemNotificationController::class, 'store'])->name('notifications.store');
 
     // 💳 Quản lý Nạp tiền
     Route::get('/deposits', [AdminController::class, 'deposits'])->name('deposits');

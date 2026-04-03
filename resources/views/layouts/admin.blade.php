@@ -402,6 +402,11 @@
                     <i class="bi bi-headset"></i> 📞 Liên hệ hỗ trợ
                 </a>
             </li>
+            <li>
+                <a href="{{ route('admin.notifications.index') }}" class="{{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}">
+                    <i class="bi bi-bell"></i> 🔔 Thông báo hệ thống
+                </a>
+            </li>
 
 
             <li class="sidebar-section-title">Quản lý User</li>
