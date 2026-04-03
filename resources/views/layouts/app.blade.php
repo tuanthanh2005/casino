@@ -984,6 +984,9 @@
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
+        {{-- App Download Banner --}}
+        @include('home.app-download-banner')
+
         @if(session('success'))
             <div class="alert alert-success mb-3">
                 <i class="bi bi-check-circle-fill"></i> {{ session('success') }}

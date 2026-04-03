@@ -16,6 +16,7 @@ use App\Http\Controllers\SystemNotificationController;
 use App\Http\Controllers\SupportChatController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Admin\BlogPostController;
+use App\Http\Controllers\Admin\AppSettingsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -269,6 +270,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/nav/orders/{id}/generate-appeal',   [NavAdminController::class, 'generateAppeal'])->name('nav.orders.appeal');
     Route::get('/nav/settings',                      [NavAdminController::class, 'settings'])->name('nav.settings');
     Route::post('/nav/settings',                     [NavAdminController::class, 'saveSettings'])->name('nav.settings.save');
+
+    // 📱 App Download Settings
+    Route::get('/app-settings',                      [AppSettingsController::class, 'index'])->name('app-settings');
+    Route::post('/app-settings',                     [AppSettingsController::class, 'save'])->name('app-settings.save');
+    Route::post('/app-settings/remove-icon/{platform}', [AppSettingsController::class, 'removeIcon'])->name('app-settings.remove-icon');
 });
 
 // Test API RapidAPI Bóng đá

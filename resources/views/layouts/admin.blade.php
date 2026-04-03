@@ -511,6 +511,13 @@
                 </a>
             </li>
 
+            <li class="sidebar-section-title">📱 Ứng Dụng</li>
+            <li>
+                <a href="{{ route('admin.app-settings') }}" class="{{ request()->routeIs('admin.app-settings*') ? 'active' : '' }}">
+                    <i class="bi bi-phone"></i> Cài đặt App Download
+                </a>
+            </li>
+
             <li>
                 <a href="{{ route('home') }}" target="_blank">
                     <i class="bi bi-box-arrow-up-right"></i> Xem trang chính
