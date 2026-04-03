@@ -385,6 +385,8 @@ class AdminController extends Controller
             'farm_sell_win_rate_target' => 'required|numeric|min:5|max:95',
             'farm_sell_loss_pool'       => 'required|string|max:255',
             'farm_sell_win_pool'        => 'required|string|max:255',
+            'register_bonus_enabled'    => 'required|in:0,1',
+            'register_bonus_points'     => 'required|numeric|min:0|max:100000000',
         ]);
 
         $keys = [
@@ -392,6 +394,7 @@ class AdminController extends Controller
             'dice_enabled','dice_house_edge','dice_win_rate_limit','dice_payout_mult','dice_max_bet',
             'rps_enabled','rps_house_edge','rps_win_rate_limit','rps_win_rate_target','rps_monthly_win_rate_target','rps_draw_rate','rps_single_payout_mult','rps_bo3_payout_mult','rps_max_bet',
             'farm_sell_win_rate_target','farm_sell_loss_pool','farm_sell_win_pool',
+            'register_bonus_enabled','register_bonus_points',
         ];
         foreach ($keys as $key) {
             GameSetting::set($key, $request->input($key));

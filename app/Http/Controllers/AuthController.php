@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GameSetting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,17 +50,26 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
+        $registerBonusEnabled = (string) GameSetting::get('register_bonus_enabled', '1') === '1';
+        $registerBonusPoints = max(0, (float) GameSetting::get('register_bonus_points', (string) self::REGISTER_BONUS_POINTS));
+        $initialBalance = $registerBonusEnabled ? $registerBonusPoints : 0;
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'user',
-            'balance_point' => self::REGISTER_BONUS_POINTS,
+            'balance_point' => $initialBalance,
         ]);
 
         Auth::login($user);
 
-        return redirect()->route('home')->with('success', 'Đăng ký thành công! Bạn đã nhận ' . self::REGISTER_BONUS_POINTS . ' PT khởi đầu.');
+        $message = 'Đăng ký thành công! Chào mừng bạn đến với AquaHub.';
+        if ($registerBonusEnabled && $registerBonusPoints > 0) {
+            $message = 'Đăng ký thành công! Bạn đã nhận ' . number_format($registerBonusPoints, 0) . ' PT khởi đầu.';
+        }
+
+        return redirect()->route('home')->with('success', $message);
     }
 
     public function logout(Request $request)

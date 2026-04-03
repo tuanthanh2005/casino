@@ -288,6 +288,30 @@
                     </div>
                 </div>
             </div>
+
+            {{-- THƯỞNG ĐĂNG KÝ --}}
+            <div style="grid-column:1 / -1; margin-top:0.5rem; padding-top:1rem; border-top:1px dashed var(--border)">
+                <div style="font-weight:700; font-size:0.95rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border)">
+                    🎁 Thưởng Tài Khoản Mới
+                </div>
+                <div class="cfg-grid">
+                    <div class="toggle-wrap">
+                        <label class="toggle">
+                            <input type="checkbox" id="cfg_register_bonus_enabled" {{ $settings->get('register_bonus_enabled','1') == '1' ? 'checked' : '' }}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span style="font-size:0.875rem">Bật thưởng khi đăng ký tài khoản mới</span>
+                    </div>
+
+                    <div>
+                        <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.4rem">Số Point thưởng mặc định</label>
+                        <input type="number" class="form-control" id="cfg_register_bonus_points" value="{{ $settings->get('register_bonus_points','100') }}" min="0" step="1">
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.35rem">
+                            Đặt 100 để chạy khuyến mãi mặc định. Tắt công tắc khi hết đợt promo.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -560,6 +584,8 @@ async function saveCasinoSettings() {
         farm_sell_win_rate_target: document.getElementById('cfg_farm_sell_win_rate_target').value,
         farm_sell_loss_pool:       document.getElementById('cfg_farm_sell_loss_pool').value,
         farm_sell_win_pool:        document.getElementById('cfg_farm_sell_win_pool').value,
+        register_bonus_enabled:    document.getElementById('cfg_register_bonus_enabled').checked ? '1' : '0',
+        register_bonus_points:     document.getElementById('cfg_register_bonus_points').value,
     };
 
     try {
