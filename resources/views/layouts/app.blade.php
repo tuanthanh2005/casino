@@ -1080,6 +1080,16 @@
                         <i class="bi bi-save"></i> Cập nhật ngay
                     </button>
                 </form>
+
+                <hr style="border-color:rgba(255,255,255,0.1); margin: 1.5rem 0">
+
+                <!-- Nút Đăng Xuất (Đặc biệt hữu ích cho Mobile) -->
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-outline w-100" style="padding:0.875rem; color:#ef4444; border-color:rgba(239,68,68,0.3)">
+                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                    </button>
+                </form>
             </div>
         </div>
     </div>
