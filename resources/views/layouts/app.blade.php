@@ -4,8 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'AquaHub - Kết nối Dịch vụ & Giải trí') | AquaHub</title>
-    <meta name="description" content="Webgame dự đoán giá Bitcoin Long/Short - Đổi Point lấy quà tặng Premium">
+    <title>@yield('title', 'AquaHub Pro - Dự Đoán BTC, Mini Games & Nông Trại Kiếm Point')</title>
+    <meta name="description" content="AquaHub Pro - Nền tảng giải trí đa năng: Dự đoán giá Bitcoin Long/Short, Mini Games hấp dẫn và Nông trại ảo. Tích lũy Point đổi quà tặng Premium ngay hôm nay.">
+    <meta name="keywords" content="aquahub, aquahub pro, dự đoán btc, game nông trại, mini games, đổi thưởng, bitcoin prediction">
+    <meta name="robots" content="@yield('meta_robots', 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1')">
+    <meta name="googlebot" content="@yield('meta_googlebot', 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1')">
+    <meta name="theme-color" content="#0a0a0f">
+    <link rel="canonical" href="@yield('canonical', url()->current())">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ url('/sitemap.xml') }}">
+    @if(config('services.google.site_verification'))
+    <meta name="google-site-verification" content="{{ config('services.google.site_verification') }}">
+    @endif
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('av.png') }}">
+    <link rel="shortcut icon" href="{{ asset('av.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('av.png') }}">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AquaHub Pro">
+    <meta property="og:locale" content="vi_VN">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="AquaHub Pro - Kết Nối Dịch Vụ & Giải Trí Đỉnh Cao">
+    <meta property="og:description" content="Dự đoán BTC, Mini Games & Nông Trại. Hệ thống giải trí minh bạch, uy tín tại AquaHub Pro.">
+    <meta property="og:image" content="{{ asset('av.png') }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="AquaHub Pro - Mini Games & BTC Prediction">
+    <meta property="twitter:description" content="Nền tảng giải trí đa năng tích hợp nông trại và dự đoán giá Crypto.">
+    <meta property="twitter:image" content="{{ asset('av.png') }}">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "AquaHub Pro",
+            "url": "{{ config('app.url') }}",
+            "description": "Nền tảng Mini Games, Dự đoán giá BTC và Nông trại giải trí tích hợp."
+    }
+    </script>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

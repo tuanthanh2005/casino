@@ -40,4 +40,8 @@ return [
         'chat_id' => env('TELEGRAM_CHAT_ID'),
     ],
 
+    'google' => [
+        'site_verification' => env('GOOGLE_SITE_VERIFICATION'),
+    ],
+
 ];
