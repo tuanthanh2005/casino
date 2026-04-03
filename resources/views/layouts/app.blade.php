@@ -1020,7 +1020,7 @@
         $supportCenterLabel = $supportSettings['support_center_label'] ?? 'Trung tâm hỗ trợ MXH';
         $supportPhone = $supportSettings['support_phone'] ?? '0900000000';
         $supportEmail = $supportSettings['support_email'] ?? 'support@aquahub.vn';
-        $supportZaloUrl = $supportSettings['support_zalo_url'] ?? 'https://zalo.me';
+        $supportZaloUrl = $supportSettings['support_zalo_url'] ?? 'https://t.me';
         $supportMessengerUrl = $supportSettings['support_messenger_url'] ?? 'https://m.me';
         $supportWorkingHours = $supportSettings['support_working_hours'] ?? '08:00 - 22:00 mỗi ngày';
     @endphp
@@ -1098,7 +1098,7 @@
                     <i class="bi bi-envelope"></i> Email: {{ $supportEmail }}
                 </a>
                 <a href="{{ $supportZaloUrl }}" target="_blank" rel="noopener" class="btn btn-outline" style="justify-content:flex-start">
-                    <i class="bi bi-chat-left-dots"></i> Zalo hỗ trợ
+                    <i class="bi bi-telegram"></i> Telegram hỗ trợ
                 </a>
                 <a href="{{ $supportMessengerUrl }}" target="_blank" rel="noopener" class="btn btn-outline" style="justify-content:flex-start">
                     <i class="bi bi-messenger"></i> Facebook Messenger

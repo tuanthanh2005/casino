@@ -637,7 +637,7 @@ class AdminController extends Controller
             'support_center_label' => 'Trung tâm hỗ trợ MXH',
             'support_phone' => '0900000000',
             'support_email' => 'support@aquahub.vn',
-            'support_zalo_url' => 'https://zalo.me',
+            'support_zalo_url' => 'https://t.me',
             'support_messenger_url' => 'https://m.me',
             'support_working_hours' => '08:00 - 22:00 mỗi ngày',
             'telegram_enabled' => '0',

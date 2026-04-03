@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GameSetting;
 use App\Models\SupportChat;
 use Illuminate\Http\Request;
 
@@ -21,7 +22,25 @@ class SupportChatController extends Controller
             ->take(300)
             ->get();
 
-        return view('support.chat', compact('messages'));
+        $supportSettings = GameSetting::getMany([
+            'support_center_label',
+            'support_phone',
+            'support_email',
+            'support_zalo_url',
+            'support_messenger_url',
+            'support_working_hours',
+        ]);
+
+        $support = [
+            'center_label' => $supportSettings['support_center_label'] ?? 'Trung tâm hỗ trợ MXH',
+            'phone' => $supportSettings['support_phone'] ?? '0900000000',
+            'email' => $supportSettings['support_email'] ?? 'support@aquahub.vn',
+            'zalo_url' => $supportSettings['support_zalo_url'] ?? 'https://t.me',
+            'messenger_url' => $supportSettings['support_messenger_url'] ?? 'https://m.me',
+            'working_hours' => $supportSettings['support_working_hours'] ?? '08:00 - 22:00 mỗi ngày',
+        ];
+
+        return view('support.chat', compact('messages', 'support'));
     }
 
     public function send(Request $request)

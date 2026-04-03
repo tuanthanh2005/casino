@@ -42,7 +42,7 @@
             </div>
 
             <div>
-                <label class="form-label">Link Zalo</label>
+                <label class="form-label">Link Telegram</label>
                 <input type="url" name="support_zalo_url" class="form-control" value="{{ old('support_zalo_url', $settings['support_zalo_url']) }}" required>
             </div>
 
