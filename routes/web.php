@@ -33,32 +33,51 @@ Route::get('/landing', function () {
 Route::get('/sitemap.xml', function () {
     $baseUrl = rtrim(config('app.url') ?: url('/'), '/');
 
-    $staticUrls = [
-        [
-            'loc' => $baseUrl . '/landing',
-            'lastmod' => now()->toDateString(),
-            'changefreq' => 'daily',
-            'priority' => '1.0',
-        ],
-        [
-            'loc' => $baseUrl . '/blog',
-            'lastmod' => now()->toDateString(),
-            'changefreq' => 'daily',
-            'priority' => '0.9',
-        ],
-        [
-            'loc' => $baseUrl . '/login',
-            'lastmod' => now()->toDateString(),
-            'changefreq' => 'monthly',
-            'priority' => '0.8',
-        ],
-        [
-            'loc' => $baseUrl . '/register',
-            'lastmod' => now()->toDateString(),
-            'changefreq' => 'monthly',
-            'priority' => '0.8',
-        ],
-    ];
+    $staticUrls = collect(Route::getRoutes())
+        ->filter(function ($route) {
+            $uri = ltrim($route->uri(), '/');
+            $methods = $route->methods();
+            $middlewares = $route->gatherMiddleware();
+
+            if (! in_array('GET', $methods, true)) {
+                return false;
+            }
+
+            if (str_contains($uri, '{')) {
+                return false;
+            }
+
+            if (in_array($uri, ['sitemap.xml', 'up'], true)) {
+                return false;
+            }
+
+            if (
+                str_starts_with($uri, 'admin') ||
+                str_starts_with($uri, 'api') ||
+                str_starts_with($uri, 'storage') ||
+                str_starts_with($uri, 'vendor')
+            ) {
+                return false;
+            }
+
+            if (in_array('auth', $middlewares, true) || in_array('admin', $middlewares, true)) {
+                return false;
+            }
+
+            return true;
+        })
+        ->map(function ($route) use ($baseUrl) {
+            $uri = trim($route->uri(), '/');
+
+            return [
+                'loc' => $uri === '' ? $baseUrl : $baseUrl . '/' . $uri,
+                'lastmod' => now()->toDateString(),
+                'changefreq' => 'weekly',
+                'priority' => $uri === 'landing' ? '1.0' : '0.8',
+            ];
+        })
+        ->values()
+        ->all();
 
     $postUrls = BlogPost::query()
         ->published()
@@ -68,7 +87,7 @@ Route::get('/sitemap.xml', function () {
             $lastmodDate = ($post->updated_at ?? $post->published_at ?? now())->toDateString();
 
             return [
-                'loc' => route('blog.show', $post, false),
+                'loc' => route('blog.show', $post),
                 'lastmod' => $lastmodDate,
                 'changefreq' => 'weekly',
                 'priority' => '0.7',
@@ -76,7 +95,10 @@ Route::get('/sitemap.xml', function () {
         })
         ->all();
 
-    $urls = array_merge($staticUrls, $postUrls);
+    $urls = collect(array_merge($staticUrls, $postUrls))
+        ->unique('loc')
+        ->values()
+        ->all();
 
     $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
