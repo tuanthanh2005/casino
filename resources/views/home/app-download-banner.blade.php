@@ -128,7 +128,7 @@
                 <div class="ios-step-num">3</div>
                 <div class="ios-step-text">
                     Nếu chưa thấy popup, mở menu trình duyệt và chọn:
-                    <span class="ios-step-note">Chrome: <strong>Install AquaHub...</strong> | Edge: <strong>Apps → Install this site as an app</strong></span>
+                    <span class="ios-step-note">Bấm 3 chấm <strong>⋮ Chọn Truyền, lưu và chia sẻ → Cài đặt Ứng dụng</strong>. Edge: <strong>⋮ → Ứng dụng → Cài đặt trang web này dưới dạng ứng dụng</strong></span>
                 </div>
             </div>
             <div class="ios-step">
