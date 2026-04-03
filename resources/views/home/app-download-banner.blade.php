@@ -100,7 +100,7 @@
 {{-- Hiện ra khi banner chính bị thu gọn --}}
 <div class="app-mini-bar" id="app-mini-bar" onclick="expandAppBanner()">
     <div class="app-mini-content">
-        <i class="bi bi-chevron-down ms-auto" style="font-size:0.8rem"></i>
+        <i class="bi bi-chevron-down ms-auto" style="font-size:0.5rem"></i>
     </div>
 </div>
 
