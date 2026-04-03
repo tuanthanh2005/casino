@@ -23,6 +23,13 @@ class SupportChatAdminController extends Controller
         $selectedUserId = (int) $request->query('user_id', $userIds->first() ?? 0);
         $selectedUser = $selectedUserId ? ($users[$selectedUserId] ?? User::find($selectedUserId)) : null;
 
+        if ($selectedUserId > 0) {
+            SupportChat::where('user_id', $selectedUserId)
+                ->where('from_role', 'user')
+                ->where('is_read', false)
+                ->update(['is_read' => true]);
+        }
+
         $unreadMap = SupportChat::select('user_id', DB::raw('COUNT(*) as c'))
             ->where('from_role', 'user')
             ->where('is_read', false)
@@ -42,11 +49,6 @@ class SupportChatAdminController extends Controller
 
         $messages = collect();
         if ($selectedUserId > 0) {
-            SupportChat::where('user_id', $selectedUserId)
-                ->where('from_role', 'user')
-                ->where('is_read', false)
-                ->update(['is_read' => true]);
-
             $messages = SupportChat::where('user_id', $selectedUserId)
                 ->orderBy('id')
                 ->take(500)
