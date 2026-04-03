@@ -658,9 +658,72 @@
                 transform: translateY(-5px);
                 text-shadow: 0 0 15px var(--primary);
             }
+
+            .mobile-nav-loader {
+                position: fixed;
+                inset: 0;
+                z-index: 3500;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                background: rgba(3, 8, 22, 0.76);
+                backdrop-filter: blur(8px);
+            }
+
+            .mobile-nav-loader.show {
+                display: flex;
+            }
+
+            .mobile-nav-loader-card {
+                width: min(86vw, 260px);
+                border: 1px solid rgba(34, 211, 238, 0.34);
+                border-radius: 18px;
+                background: linear-gradient(145deg, rgba(9, 17, 34, 0.95), rgba(8, 14, 28, 0.92));
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+                padding: 1rem 1.1rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.6rem;
+            }
+
+            .mobile-nav-loader-brand {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.45rem;
+                color: #22d3ee;
+                font-weight: 800;
+                letter-spacing: 0.01em;
+            }
+
+            .mobile-nav-loader-brand i {
+                font-size: 1.1rem;
+            }
+
+            .mobile-nav-loader-text {
+                font-size: 0.82rem;
+                color: #b6c5d8;
+            }
+
+            .mobile-nav-loader-spinner {
+                width: 28px;
+                height: 28px;
+                border: 2px solid rgba(34, 211, 238, 0.25);
+                border-top-color: #22d3ee;
+                border-radius: 50%;
+                animation: mobileLoaderSpin 0.85s linear infinite;
+            }
+
+            body.is-mobile-nav-loading {
+                overflow: hidden;
+            }
+
+            @keyframes mobileLoaderSpin {
+                to { transform: rotate(360deg); }
+            }
         }
         @media (min-width: 769px) {
-            .mobile-header, .mobile-bottom-nav { display: none !important; }
+            .mobile-header, .mobile-bottom-nav, .mobile-nav-loader { display: none !important; }
         }
 
         /* ── PAGE CONTENT TRANSITION ── */
@@ -815,6 +878,17 @@
             <i class="bi bi-chat-dots"></i>
             <span>Liên hệ</span>
         </a>
+    </div>
+
+    <div class="mobile-nav-loader" id="mobile-nav-loader" aria-hidden="true">
+        <div class="mobile-nav-loader-card">
+            <div class="mobile-nav-loader-brand">
+                <i class="bi bi-water"></i>
+                <span>AquaHub</span>
+            </div>
+            <div class="mobile-nav-loader-spinner"></div>
+            <div class="mobile-nav-loader-text">Đang tải trang...</div>
+        </div>
     </div>
     @endauth
 
@@ -1045,6 +1119,39 @@
             if (e.key === 'Escape') closeProfileModal();
             if (e.key === 'Escape') closeContactModal();
         });
+
+        // Mobile bottom-nav loading indicator
+        function initMobileNavLoader() {
+            if (!window.matchMedia('(max-width: 768px)').matches) return;
+
+            const loader = document.getElementById('mobile-nav-loader');
+            if (!loader) return;
+
+            document.querySelectorAll('.mobile-bottom-nav .m-nav-item[href]').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    const href = (link.getAttribute('href') || '').trim();
+
+                    // Skip non-navigation links and special click actions.
+                    if (!href || href.startsWith('javascript:') || href.startsWith('#')) return;
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                    if (link.getAttribute('target') === '_blank') return;
+
+                    const targetUrl = new URL(link.href, window.location.origin);
+                    const currentUrl = new URL(window.location.href);
+                    if (targetUrl.pathname === currentUrl.pathname && targetUrl.search === currentUrl.search) return;
+
+                    loader.classList.add('show');
+                    document.body.classList.add('is-mobile-nav-loading');
+                });
+            });
+
+            window.addEventListener('pageshow', function() {
+                loader.classList.remove('show');
+                document.body.classList.remove('is-mobile-nav-loading');
+            });
+        }
+
+        initMobileNavLoader();
     </script>
 
     @stack('scripts')

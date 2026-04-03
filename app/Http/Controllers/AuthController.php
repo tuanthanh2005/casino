@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    private const REGISTER_BONUS_POINTS = 100;
+
     public function showLogin()
     {
         return view('auth.login');
@@ -52,12 +54,12 @@ class AuthController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'user',
-            'balance_point' => 0,
+            'balance_point' => self::REGISTER_BONUS_POINTS,
         ]);
 
         Auth::login($user);
 
-        return redirect()->route('home')->with('success', 'Đăng ký thành công! Chào mừng bạn đến với AquaHub.');
+        return redirect()->route('home')->with('success', 'Đăng ký thành công! Bạn đã nhận ' . self::REGISTER_BONUS_POINTS . ' PT khởi đầu.');
     }
 
     public function logout(Request $request)
