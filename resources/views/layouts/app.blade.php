@@ -257,6 +257,20 @@
             gap: 0.45rem;
         }
         .nav-dropdown-menu.open { display: grid; animation: dropDown 0.2s ease; }
+        .nav-dropdown-menu.nav-dropdown-menu--compact {
+            width: 250px;
+            padding: 0.45rem;
+            grid-template-columns: 1fr;
+            gap: 0.35rem;
+        }
+        .nav-dropdown-menu.nav-dropdown-menu--compact.open {
+            display: grid;
+        }
+        .nav-dropdown-menu.nav-dropdown-menu--compact .nav-dropdown-item {
+            min-height: 0;
+            padding: 0.55rem 0.65rem;
+            align-items: center;
+        }
         @keyframes dropDown {
             from { opacity:0; transform:translateY(-8px); }
             to   { opacity:1; transform:translateY(0); }
@@ -758,9 +772,9 @@
                 {{-- Dropdown Games --}}
                 <li class="nav-dropdown">
                     <a href="#" class="nav-link nav-dropdown-toggle {{ request()->routeIs('home') || request()->routeIs('games.catalog') || request()->routeIs('prediction') || request()->routeIs('spin') || request()->routeIs('dice') || request()->routeIs('rps') || request()->routeIs('farm*') ? 'active' : '' }}"
-                       onclick="toggleNavDropdown(event)">
+                       onclick="toggleNavDropdown(event, 'nav-games-dropdown', 'nav-chevron-games')">
                         <i class="bi bi-controller"></i> Games
-                        <i class="bi bi-chevron-down" style="font-size:0.65rem; margin-left:2px; transition:transform 0.2s" id="nav-chevron"></i>
+                        <i class="bi bi-chevron-down" style="font-size:0.65rem; margin-left:2px; transition:transform 0.2s" id="nav-chevron-games"></i>
                     </a>
                     <div class="nav-dropdown-menu" id="nav-games-dropdown">
                         <a href="{{ route('games.catalog') }}" class="nav-dropdown-item {{ request()->routeIs('games.catalog') ? 'active' : '' }}">
@@ -814,12 +828,29 @@
                     style="{{ request()->routeIs('nav.*') ? 'color:#69C9D0!important' : '' }}">
                     🛡️ Hỗ Trợ MXH
                 </a></li>
-                <li><a href="{{ route('payment.deposit') }}" class="nav-link {{ request()->routeIs('payment.deposit*') ? 'active' : '' }}">
-                    <i class="bi bi-plus-circle"></i> Nạp tiền
-                </a></li>
-                <li><a href="{{ route('payment.withdraw') }}" class="nav-link {{ request()->routeIs('payment.withdraw*') ? 'active' : '' }}">
-                    <i class="bi bi-arrow-up-right-circle"></i> Rút / Đổi
-                </a></li>
+                <li class="nav-dropdown">
+                    <a href="#" class="nav-link nav-dropdown-toggle {{ request()->routeIs('payment.deposit*') || request()->routeIs('payment.withdraw*') ? 'active' : '' }}"
+                       onclick="toggleNavDropdown(event, 'nav-wallet-dropdown', 'nav-chevron-wallet')">
+                        <i class="bi bi-wallet2"></i> Ví
+                        <i class="bi bi-chevron-down" style="font-size:0.65rem; margin-left:2px; transition:transform 0.2s" id="nav-chevron-wallet"></i>
+                    </a>
+                    <div class="nav-dropdown-menu nav-dropdown-menu--compact" id="nav-wallet-dropdown">
+                        <a href="{{ route('payment.deposit') }}" class="nav-dropdown-item {{ request()->routeIs('payment.deposit*') ? 'active' : '' }}">
+                            <span class="nav-dropdown-icon" style="background:rgba(6,182,212,0.15)"><i class="bi bi-plus-circle"></i></span>
+                            <div>
+                                <div style="font-weight:600">Nạp tiền</div>
+                                <div style="font-size:0.72rem; color:var(--text-muted)">Nạp PT vào ví</div>
+                            </div>
+                        </a>
+                        <a href="{{ route('payment.withdraw') }}" class="nav-dropdown-item {{ request()->routeIs('payment.withdraw*') ? 'active' : '' }}">
+                            <span class="nav-dropdown-icon" style="background:rgba(16,185,129,0.15)"><i class="bi bi-arrow-up-right-circle"></i></span>
+                            <div>
+                                <div style="font-weight:600">Rút / Đổi</div>
+                                <div style="font-size:0.72rem; color:var(--text-muted)">Rút điểm hoặc quy đổi</div>
+                            </div>
+                        </a>
+                    </div>
+                </li>
                 <li><a href="{{ route('support.chat') }}" class="nav-link {{ request()->routeIs('support.chat*') ? 'active' : '' }}">
                     <i class="bi bi-chat-dots"></i> Hỗ trợ
                 </a></li>
@@ -1044,21 +1075,37 @@
         }
 
         // Nav dropdown toggle
-        function toggleNavDropdown(e) {
+        function toggleNavDropdown(e, menuId, chevronId) {
             e.preventDefault();
-            const menu    = document.getElementById('nav-games-dropdown');
-            const chevron = document.getElementById('nav-chevron');
+            const menu    = document.getElementById(menuId);
+            const chevron = document.getElementById(chevronId);
+            if (!menu) return;
+
+            // Close other dropdowns before opening the requested one.
+            ['nav-games-dropdown', 'nav-wallet-dropdown'].forEach(function(id) {
+                if (id !== menuId) {
+                    document.getElementById(id)?.classList.remove('open');
+                }
+            });
+            ['nav-chevron-games', 'nav-chevron-wallet'].forEach(function(id) {
+                if (id !== chevronId) {
+                    const icon = document.getElementById(id);
+                    if (icon) icon.style.transform = '';
+                }
+            });
+
             const isOpen  = menu.classList.toggle('open');
             if (chevron) chevron.style.transform = isOpen ? 'rotate(180deg)' : '';
         }
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
-            const dropdown = document.querySelector('.nav-dropdown');
-            const chevron = document.getElementById('nav-chevron');
-            if (dropdown && !dropdown.contains(e.target)) {
-                document.getElementById('nav-games-dropdown')?.classList.remove('open');
-                if (chevron) chevron.style.transform = '';
-            }
+            document.querySelectorAll('.nav-dropdown').forEach(function(dropdown) {
+                if (!dropdown.contains(e.target)) {
+                    dropdown.querySelector('.nav-dropdown-menu')?.classList.remove('open');
+                    const chevron = dropdown.querySelector('.bi-chevron-down');
+                    if (chevron) chevron.style.transform = '';
+                }
+            });
         });
 
         // Profile Modal Logic

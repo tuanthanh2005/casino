@@ -11,7 +11,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-4xl font-black text-white mb-2">
-                        Chào mừng lại, <span class="bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">{{ Auth::user()->name }}</span> 👋
+                        Xin Chào, <span class="bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">{{ Auth::user()->name }}</span> 👋
                     </h1>
                     <p class="text-slate-400">Hôm nay là {{ now()->format('d/m/Y') }} - Bắt đầu cuộc phiêu lưu của bạn!</p>
                 </div>
