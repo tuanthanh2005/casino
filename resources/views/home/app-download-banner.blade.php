@@ -30,9 +30,17 @@
         {{-- Nút tải --}}
         <div class="app-banner-buttons">
 
-            {{-- NÚT ANDROID: PWA install hoặc link APK --}}
+            {{-- NÚT DESKTOP: luôn hiển thị để cài PWA ra Desktop --}}
+            <button type="button" class="app-dl-btn app-dl-btn--desktop" onclick="triggerPwaInstall('desktop')">
+                <span class="app-dl-btn-emoji">🖥️</span>
+                <div class="app-dl-btn-text">
+                    <span class="app-dl-btn-store">Desktop app</span>
+                    <span class="app-dl-btn-label">Cài Desktop</span>
+                </div>
+            </button>
+
+            {{-- NÚT ANDROID: luôn hiển thị để đủ 3 nút --}}
             @if($androidUrl && $androidUrl !== '#')
-                {{-- Có link APK/Play Store → mở link --}}
                 <a href="{{ $androidUrl }}" class="app-dl-btn app-dl-btn--android" target="_blank" rel="noopener">
                     @if($androidIcon)
                         <img src="{{ asset($androidIcon) }}" class="app-dl-btn-icon" alt="">
@@ -40,22 +48,16 @@
                         <span class="app-dl-btn-emoji">🤖</span>
                     @endif
                     <div class="app-dl-btn-text">
-                        <span class="app-dl-btn-store">Google Play</span>
-                        <span class="app-dl-btn-label">{{ $androidLabel }}</span>
+                        <span class="app-dl-btn-store">Android APK</span>
+                        <span class="app-dl-btn-label">Tải Android</span>
                     </div>
                 </a>
             @else
-                {{-- Không có link → dùng PWA install --}}
-                <button type="button" class="app-dl-btn app-dl-btn--android" id="btn-pwa-android"
-                    onclick="triggerPwaInstall('android')">
-                    @if($androidIcon)
-                        <img src="{{ asset($androidIcon) }}" class="app-dl-btn-icon" alt="">
-                    @else
-                        <span class="app-dl-btn-emoji">🤖</span>
-                    @endif
+                <button type="button" class="app-dl-btn app-dl-btn--android" onclick="triggerAndroidInstall()">
+                    <span class="app-dl-btn-emoji">🤖</span>
                     <div class="app-dl-btn-text">
-                        <span class="app-dl-btn-store" id="android-store-label">Cài vào máy</span>
-                        <span class="app-dl-btn-label" id="android-main-label">{{ $androidLabel }}</span>
+                        <span class="app-dl-btn-store">Android app</span>
+                        <span class="app-dl-btn-label">Tải Android</span>
                     </div>
                 </button>
             @endif
@@ -96,6 +98,45 @@
     </div>
 </div>
 
+{{-- ═══════════════ ANDROID GUIDE MODAL ═══════════════ --}}
+<div class="ios-guide-overlay" id="android-guide-overlay" onclick="closeAndroidGuide()">
+    <div class="ios-guide-card" onclick="event.stopPropagation()">
+        <button class="ios-guide-close" onclick="closeAndroidGuide()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="ios-guide-header">
+            <span style="font-size:2.2rem">🤖</span>
+            <div>
+                <div class="ios-guide-title">Cài AquaHub trên Android</div>
+                <div class="ios-guide-sub">Nếu không có APK, bạn vẫn cài được như app thường</div>
+            </div>
+        </div>
+        <div class="ios-guide-steps">
+            <div class="ios-step">
+                <div class="ios-step-num">1</div>
+                <div class="ios-step-text">
+                    Mở trang bằng <strong>Chrome Android</strong>
+                </div>
+            </div>
+            <div class="ios-step">
+                <div class="ios-step-num">2</div>
+                <div class="ios-step-text">
+                    Bấm nút <strong>Tải Android</strong> trên banner
+                </div>
+            </div>
+            <div class="ios-step">
+                <div class="ios-step-num">3</div>
+                <div class="ios-step-text">
+                    Nếu chưa hiện popup, bấm <strong>⋮</strong> và chọn <strong>Thêm vào màn hình chính</strong> hoặc <strong>Cài đặt ứng dụng</strong>
+                </div>
+            </div>
+        </div>
+        <button class="ios-guide-done" onclick="closeAndroidGuide()">
+            <i class="bi bi-check-circle"></i> Đã hiểu, đóng lại
+        </button>
+    </div>
+</div>
+
 {{-- ═══════════════ DESKTOP GUIDE MODAL ═══════════════ --}}
 <div class="ios-guide-overlay" id="desktop-guide-overlay" onclick="closeDesktopGuide()">
     <div class="ios-guide-card" onclick="event.stopPropagation()">
@@ -120,7 +161,7 @@
             <div class="ios-step">
                 <div class="ios-step-num">2</div>
                 <div class="ios-step-text">
-                    Bấm nút <strong>Cài vào máy</strong> trên banner
+                    Bấm nút <strong>Cài Desktop</strong> trên banner
                     <span class="ios-step-note">Nếu trình duyệt hỗ trợ, hộp thoại cài sẽ hiện ngay</span>
                 </div>
             </div>
@@ -314,6 +355,11 @@
         color: white;
     }
 
+    .app-dl-btn--desktop {
+        background: linear-gradient(135deg, #0369a1, #0ea5e9);
+        color: white;
+    }
+
     .app-dl-btn--ios {
         background: linear-gradient(135deg, #1c1c1e, #3a3a3c);
         color: white;
@@ -471,7 +517,7 @@
 
         .app-banner-buttons {
             display: grid !important;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             width: 100%;
             gap: 0.5rem;
         }
@@ -490,32 +536,13 @@
             return /iPad|iPhone|iPod/.test(ua);
         }
 
-        function isMobileDevice() {
-            return window.matchMedia('(max-width: 768px)').matches;
-        }
-
-        function isDesktopDevice() {
-            return !isMobileDevice() && !isIosDevice();
+        function isAndroidDevice() {
+            const ua = navigator.userAgent || navigator.vendor || '';
+            return /Android/i.test(ua);
         }
 
         function isStandaloneMode() {
             return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        }
-
-        function updateInstallCtaCopy() {
-            const storeLabelEl = document.getElementById('android-store-label');
-            const mainLabelEl = document.getElementById('android-main-label');
-
-            if (!storeLabelEl || !mainLabelEl) return;
-
-            if (isDesktopDevice()) {
-                storeLabelEl.textContent = 'Desktop app';
-                mainLabelEl.textContent = 'Thêm icon Desktop';
-                return;
-            }
-
-            storeLabelEl.textContent = 'Cài vào máy';
-            mainLabelEl.textContent = @json($androidLabel);
         }
 
         window.collapseAppBanner = function () {
@@ -560,12 +587,39 @@
             document.getElementById('desktop-guide-overlay')?.classList.add('open');
         };
 
+        window.showAndroidGuide = function () {
+            document.getElementById('android-guide-overlay')?.classList.add('open');
+        };
+
+        window.triggerAndroidInstall = function () {
+            if (isAndroidDevice()) {
+                if (window.installPWA) {
+                    window.installPWA();
+                    return;
+                }
+
+                window.showAndroidGuide();
+                return;
+            }
+
+            if (window.showToast) {
+                window.showToast('Nút này dành cho Android. Trên máy tính hãy dùng nút Cài Desktop.', 'info');
+                return;
+            }
+
+            alert('Nút này dành cho Android. Trên máy tính hãy dùng nút Cài Desktop.');
+        };
+
         window.closeIosGuide = function () {
             document.getElementById('ios-guide-overlay')?.classList.remove('open');
         };
 
         window.closeDesktopGuide = function () {
             document.getElementById('desktop-guide-overlay')?.classList.remove('open');
+        };
+
+        window.closeAndroidGuide = function () {
+            document.getElementById('android-guide-overlay')?.classList.remove('open');
         };
 
         // Được gọi từ layout khi không hiện được beforeinstallprompt.
@@ -575,12 +629,15 @@
                 return;
             }
 
+            if (isAndroidDevice()) {
+                window.showAndroidGuide();
+                return;
+            }
+
             window.showDesktopGuide();
         };
 
         document.addEventListener('DOMContentLoaded', function () {
-            updateInstallCtaCopy();
-
             // Khi app đã cài ở chế độ standalone thì ẩn banner cài đặt.
             if (isStandaloneMode()) {
                 const banner = document.getElementById('app-download-banner');
