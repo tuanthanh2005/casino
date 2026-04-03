@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Bet;
 use App\Models\DepositOrder;
 use App\Models\ExchangeRequest;
+use App\Models\FarmTransaction;
 use App\Models\GameSetting;
 use App\Models\GameSession;
 use App\Models\MiniGameLog;
+use App\Models\NavOrder;
 use App\Models\User;
 use App\Models\WithdrawalOrder;
 use Illuminate\Http\Request;
@@ -58,6 +60,211 @@ class AdminController extends Controller
         $users = $query->withCount('bets')->latest()->paginate(20);
 
         return view('admin.users', compact('users'));
+    }
+
+    /**
+     * Lịch sử giao dịch toàn hệ thống cho admin đối soát khi khách báo lỗi.
+     */
+    public function systemHistory(Request $request)
+    {
+        $filters = [
+            'user_id' => (int) $request->query('user_id', 0),
+            'source' => (string) $request->query('source', ''),
+            'status' => (string) $request->query('status', ''),
+            'from' => (string) $request->query('from', ''),
+            'to' => (string) $request->query('to', ''),
+            'q' => trim((string) $request->query('q', '')),
+        ];
+
+        $predictionLogs = DB::table('bets as b')
+            ->leftJoin('users as u', 'u.id', '=', 'b.user_id')
+            ->selectRaw("
+                b.created_at as occurred_at,
+                'prediction' as source,
+                CONCAT('BTC ', UPPER(b.bet_type)) as action,
+                b.user_id as user_id,
+                COALESCE(u.name, CONCAT('User #', b.user_id)) as user_name,
+                b.profit as amount_pt,
+                NULL as amount_vnd,
+                b.status as status,
+                CONCAT('BET#', b.id) as reference,
+                CONCAT('Dat ', b.bet_amount, ' PT') as note
+            ");
+
+        $miniGameLogs = DB::table('mini_game_logs as m')
+            ->leftJoin('users as u', 'u.id', '=', 'm.user_id')
+            ->selectRaw("
+                m.created_at as occurred_at,
+                CONCAT('minigame_', m.game_type) as source,
+                CASE
+                    WHEN m.game_type = 'spin' THEN 'Vong quay'
+                    WHEN m.game_type = 'dice' THEN 'Tai xiu'
+                    WHEN m.game_type = 'rps' THEN 'Keo bua bao'
+                    ELSE m.game_type
+                END as action,
+                m.user_id as user_id,
+                COALESCE(u.name, CONCAT('User #', m.user_id)) as user_name,
+                m.profit as amount_pt,
+                NULL as amount_vnd,
+                CASE WHEN m.won = 1 THEN 'won' ELSE 'lost' END as status,
+                CONCAT('MGL#', m.id) as reference,
+                CONCAT('Dat ', m.bet_amount, ' PT, tra ', m.payout, ' PT') as note
+            ");
+
+        $depositLogs = DB::table('deposit_orders as d')
+            ->leftJoin('users as u', 'u.id', '=', 'd.user_id')
+            ->selectRaw("
+                d.created_at as occurred_at,
+                'deposit' as source,
+                CASE
+                    WHEN d.method = 'bank_qr' THEN 'Nap QR Bank'
+                    WHEN d.method = 'card' THEN 'Nap the cao'
+                    ELSE 'Nap tien'
+                END as action,
+                d.user_id as user_id,
+                COALESCE(u.name, CONCAT('User #', d.user_id)) as user_name,
+                CASE WHEN d.status = 'approved' THEN d.points_credited ELSE 0 END as amount_pt,
+                d.amount as amount_vnd,
+                d.status as status,
+                d.order_code as reference,
+                COALESCE(d.admin_note, '') as note
+            ");
+
+        $withdrawalLogs = DB::table('withdrawal_orders as w')
+            ->leftJoin('users as u', 'u.id', '=', 'w.user_id')
+            ->selectRaw("
+                w.created_at as occurred_at,
+                'withdrawal' as source,
+                CASE
+                    WHEN w.method = 'bank_transfer' THEN 'Rut chuyen khoan'
+                    WHEN w.method = 'card' THEN 'Doi the cao'
+                    ELSE 'Rut tien'
+                END as action,
+                w.user_id as user_id,
+                COALESCE(u.name, CONCAT('User #', w.user_id)) as user_name,
+                (0 - w.points_used) as amount_pt,
+                w.net_amount as amount_vnd,
+                w.status as status,
+                w.order_code as reference,
+                COALESCE(w.admin_note, '') as note
+            ");
+
+        $exchangeLogs = DB::table('exchange_requests as e')
+            ->leftJoin('users as u', 'u.id', '=', 'e.user_id')
+            ->leftJoin('reward_items as r', 'r.id', '=', 'e.reward_item_id')
+            ->selectRaw("
+                e.created_at as occurred_at,
+                'shop_exchange' as source,
+                'Doi qua' as action,
+                e.user_id as user_id,
+                COALESCE(u.name, CONCAT('User #', e.user_id)) as user_name,
+                (0 - e.points_spent) as amount_pt,
+                NULL as amount_vnd,
+                e.status as status,
+                CONCAT('EXC#', e.id) as reference,
+                CONCAT('Vat pham: ', COALESCE(r.name, 'N/A')) as note
+            ");
+
+        $farmLogs = DB::table('farm_transactions as f')
+            ->leftJoin('users as u', 'u.id', '=', 'f.user_id')
+            ->selectRaw("
+                f.created_at as occurred_at,
+                'farm' as source,
+                f.type as action,
+                f.user_id as user_id,
+                COALESCE(u.name, CONCAT('User #', f.user_id)) as user_name,
+                CASE
+                    WHEN f.type = 'buy_seed' THEN (0 - f.total_pt)
+                    WHEN f.type = 'sell_fruit' THEN f.total_pt
+                    ELSE 0
+                END as amount_pt,
+                NULL as amount_vnd,
+                'done' as status,
+                CONCAT('FARM#', f.id) as reference,
+                COALESCE(f.note, '') as note
+            ");
+
+        $navLogs = DB::table('nav_orders as n')
+            ->leftJoin('users as u', 'u.id', '=', 'n.user_id')
+            ->selectRaw("
+                n.created_at as occurred_at,
+                'nav' as source,
+                'Don ho tro MXH' as action,
+                n.user_id as user_id,
+                COALESCE(u.name, CONCAT('User #', n.user_id)) as user_name,
+                CASE WHEN n.payment_method = 'points' THEN (0 - n.amount) ELSE 0 END as amount_pt,
+                CASE WHEN n.payment_method = 'points' THEN NULL ELSE n.amount END as amount_vnd,
+                n.status as status,
+                n.order_code as reference,
+                CONCAT('Thanh toan: ', n.payment_method) as note
+            ");
+
+        $union = $predictionLogs
+            ->unionAll($miniGameLogs)
+            ->unionAll($depositLogs)
+            ->unionAll($withdrawalLogs)
+            ->unionAll($exchangeLogs)
+            ->unionAll($farmLogs)
+            ->unionAll($navLogs);
+
+        $historyQuery = DB::query()->fromSub($union, 'h');
+
+        if ($filters['user_id'] > 0) {
+            $historyQuery->where('h.user_id', $filters['user_id']);
+        }
+        if ($filters['source'] !== '') {
+            $historyQuery->where('h.source', $filters['source']);
+        }
+        if ($filters['status'] !== '') {
+            $historyQuery->where('h.status', $filters['status']);
+        }
+        if ($filters['from'] !== '') {
+            $historyQuery->whereDate('h.occurred_at', '>=', $filters['from']);
+        }
+        if ($filters['to'] !== '') {
+            $historyQuery->whereDate('h.occurred_at', '<=', $filters['to']);
+        }
+        if ($filters['q'] !== '') {
+            $kw = '%' . $filters['q'] . '%';
+            $historyQuery->where(function ($q) use ($kw) {
+                $q->where('h.user_name', 'like', $kw)
+                    ->orWhere('h.reference', 'like', $kw)
+                    ->orWhere('h.action', 'like', $kw)
+                    ->orWhere('h.note', 'like', $kw);
+            });
+        }
+
+        $summary = [
+            'total_rows' => (clone $historyQuery)->count(),
+            'sum_pt' => (float) ((clone $historyQuery)->sum('h.amount_pt') ?? 0),
+            'sum_vnd' => (float) ((clone $historyQuery)->sum('h.amount_vnd') ?? 0),
+        ];
+
+        $logs = (clone $historyQuery)
+            ->orderByDesc('h.occurred_at')
+            ->paginate(50)
+            ->withQueryString();
+
+        $users = User::query()
+            ->where('role', 'user')
+            ->orderBy('name')
+            ->select('id', 'name', 'email')
+            ->limit(500)
+            ->get();
+
+        $sources = [
+            'prediction' => 'BTC Prediction',
+            'minigame_spin' => 'Mini game: Vòng quay',
+            'minigame_dice' => 'Mini game: Tài xỉu',
+            'minigame_rps' => 'Mini game: Kéo búa bao',
+            'deposit' => 'Nạp tiền',
+            'withdrawal' => 'Rút tiền',
+            'shop_exchange' => 'Đổi quà',
+            'farm' => 'Nông trại',
+            'nav' => 'Hỗ trợ MXH',
+        ];
+
+        return view('admin.system-history', compact('logs', 'summary', 'users', 'sources', 'filters'));
     }
 
     /**

@@ -199,6 +199,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     // Users
     Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/system-history', [AdminController::class, 'systemHistory'])->name('system.history');
     Route::post('/users/{user}/adjust-points', [AdminController::class, 'adjustPoints'])->name('users.adjust-points');
     Route::post('/users/{user}/reset-password', [AdminController::class, 'resetPassword'])->name('users.reset-password');
     

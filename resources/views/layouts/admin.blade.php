@@ -411,6 +411,11 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('admin.system.history') }}" class="{{ request()->routeIs('admin.system.history') ? 'active' : '' }}">
+                    <i class="bi bi-clock-history"></i> Lịch sử toàn hệ thống
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('admin.exchanges') }}" class="{{ request()->routeIs('admin.exchanges') ? 'active' : '' }}">
                     <i class="bi bi-gift"></i> Yêu cầu đổi quà
                     @php $pendingCount = \App\Models\ExchangeRequest::where('status','pending')->count(); @endphp
