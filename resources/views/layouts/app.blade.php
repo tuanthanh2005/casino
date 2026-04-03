@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'AquaHub Pro - Dự Đoán BTC, Mini Games & Nông Trại Kiếm Point')</title>
-    <meta name="description" content="AquaHub Pro - Nền tảng giải trí đa năng: Dự đoán giá Bitcoin Long/Short, Mini Games hấp dẫn và Nông trại ảo. Tích lũy Point đổi quà tặng Premium ngay hôm nay.">
-    <meta name="keywords" content="aquahub, aquahub pro, dự đoán btc, game nông trại, mini games, đổi thưởng, bitcoin prediction">
+    <meta name="description" content="@yield('meta_description', 'AquaHub Pro - Nền tảng giải trí đa năng: Dự đoán giá Bitcoin Long/Short, Mini Games hấp dẫn và Nông trại ảo. Tích lũy Point đổi quà tặng Premium ngay hôm nay.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'aquahub, aquahub pro, dự đoán btc, game nông trại, mini games, đổi thưởng, bitcoin prediction')">
     <meta name="robots" content="@yield('meta_robots', 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1')">
     <meta name="googlebot" content="@yield('meta_googlebot', 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1')">
     <meta name="theme-color" content="#0a0a0f">
@@ -823,6 +823,9 @@
                 <li><a href="{{ route('support.chat') }}" class="nav-link {{ request()->routeIs('support.chat*') ? 'active' : '' }}">
                     <i class="bi bi-chat-dots"></i> Hỗ trợ
                 </a></li>
+                <li><a href="{{ route('blog.index') }}" class="nav-link {{ request()->routeIs('blog.*') ? 'active' : '' }}">
+                    <i class="bi bi-journal-text"></i> Blog
+                </a></li>
                 @if(auth()->user()->isAdmin())
                 <li><a href="{{ route('admin.dashboard') }}" class="nav-link">
                     <i class="bi bi-shield-lock"></i> Admin
@@ -848,6 +851,7 @@
 
             @guest
             <div class="nav-right">
+                <a href="{{ route('blog.index') }}" class="btn btn-outline">Blog</a>
                 <a href="{{ route('login') }}" class="btn btn-outline">Đăng nhập</a>
                 <a href="{{ route('register') }}" class="btn btn-primary">Đăng ký</a>
             </div>

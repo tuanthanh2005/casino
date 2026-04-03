@@ -422,6 +422,11 @@
                     <i class="bi bi-shop"></i> Phần thưởng
                 </a>
             </li>
+            <li>
+                <a href="{{ route('admin.blog-posts.index') }}" class="{{ request()->routeIs('admin.blog-posts.*') ? 'active' : '' }}">
+                    <i class="bi bi-journal-richtext"></i> Blog SEO
+                </a>
+            </li>
 
             <li class="sidebar-section-title">💳 Tài Chính</li>
             <li>

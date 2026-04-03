@@ -12,6 +12,8 @@ use App\Http\Controllers\Admin\FarmAdminController;
 use App\Http\Controllers\Admin\NavAdminController;
 use App\Http\Controllers\Admin\SupportChatAdminController;
 use App\Http\Controllers\SupportChatController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\Admin\BlogPostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,6 +31,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -210,6 +214,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     // Reward Items CRUD
     Route::resource('rewards', RewardItemController::class);
+
+    // Blog SEO
+    Route::resource('blog-posts', BlogPostController::class)->except(['show']);
 
     // Casino Stats
     Route::get('/casino', [AdminController::class, 'casinoStats'])->name('casino');
