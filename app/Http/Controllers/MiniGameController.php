@@ -187,16 +187,50 @@ class MiniGameController extends Controller
             $forceLoseChance = min(45, (int)(($recentWinRate - ($winRateLimit / 100)) * 130));
         }
 
-        $d1    = mt_rand(1, 6);
-        $d2    = mt_rand(1, 6);
-        $d3    = mt_rand(1, 6);
-        $total = $d1 + $d2 + $d3;
+        $rollDice = static function (): array {
+            $r1 = mt_rand(1, 6);
+            $r2 = mt_rand(1, 6);
+            $r3 = mt_rand(1, 6);
+            $sum = $r1 + $r2 + $r3;
 
-        $isTriplet = ($d1 === $d2 && $d2 === $d3);
-        $result    = $total >= 11 ? 'tai' : 'xiu';
+            return [
+                'd1' => $r1,
+                'd2' => $r2,
+                'd3' => $r3,
+                'total' => $sum,
+                'isTriplet' => ($r1 === $r2 && $r2 === $r3),
+                'result' => $sum >= 11 ? 'tai' : 'xiu',
+            ];
+        };
+
+        $rolled = $rollDice();
+        $d1 = $rolled['d1'];
+        $d2 = $rolled['d2'];
+        $d3 = $rolled['d3'];
+        $total = $rolled['total'];
+        $isTriplet = $rolled['isTriplet'];
+        $result = $rolled['result'];
 
         if (!$isTriplet && $forceLoseChance > 0 && mt_rand(1, 100) <= $forceLoseChance) {
-            $result = ($result === 'tai') ? 'xiu' : 'tai';
+            for ($i = 0; $i < 30; $i++) {
+                $candidate = $rollDice();
+
+                if ($candidate['isTriplet']) {
+                    continue;
+                }
+
+                if ($candidate['result'] === $betType) {
+                    continue;
+                }
+
+                $d1 = $candidate['d1'];
+                $d2 = $candidate['d2'];
+                $d3 = $candidate['d3'];
+                $total = $candidate['total'];
+                $isTriplet = $candidate['isTriplet'];
+                $result = $candidate['result'];
+                break;
+            }
         }
 
         $won    = !$isTriplet && ($betType === $result);
