@@ -17,6 +17,7 @@ use App\Http\Controllers\SupportChatController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\AppSettingsController;
+use App\Models\BlogPost;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +29,71 @@ use Illuminate\Support\Facades\Route;
 Route::get('/landing', function () {
     return view('home.landing');
 })->name('landing');
+
+Route::get('/sitemap.xml', function () {
+    $baseUrl = rtrim(config('app.url') ?: url('/'), '/');
+
+    $staticUrls = [
+        [
+            'loc' => $baseUrl . '/landing',
+            'lastmod' => now()->toDateString(),
+            'changefreq' => 'daily',
+            'priority' => '1.0',
+        ],
+        [
+            'loc' => $baseUrl . '/blog',
+            'lastmod' => now()->toDateString(),
+            'changefreq' => 'daily',
+            'priority' => '0.9',
+        ],
+        [
+            'loc' => $baseUrl . '/login',
+            'lastmod' => now()->toDateString(),
+            'changefreq' => 'monthly',
+            'priority' => '0.8',
+        ],
+        [
+            'loc' => $baseUrl . '/register',
+            'lastmod' => now()->toDateString(),
+            'changefreq' => 'monthly',
+            'priority' => '0.8',
+        ],
+    ];
+
+    $postUrls = BlogPost::query()
+        ->published()
+        ->latest('published_at')
+        ->get()
+        ->map(function (BlogPost $post) {
+            $lastmodDate = ($post->updated_at ?? $post->published_at ?? now())->toDateString();
+
+            return [
+                'loc' => route('blog.show', $post, false),
+                'lastmod' => $lastmodDate,
+                'changefreq' => 'weekly',
+                'priority' => '0.7',
+            ];
+        })
+        ->all();
+
+    $urls = array_merge($staticUrls, $postUrls);
+
+    $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+    foreach ($urls as $item) {
+        $xml .= '<url>';
+        $xml .= '<loc>' . e($item['loc']) . '</loc>';
+        $xml .= '<lastmod>' . e($item['lastmod']) . '</lastmod>';
+        $xml .= '<changefreq>' . e($item['changefreq']) . '</changefreq>';
+        $xml .= '<priority>' . e($item['priority']) . '</priority>';
+        $xml .= '</url>';
+    }
+
+    $xml .= '</urlset>';
+
+    return response($xml, 200)->header('Content-Type', 'application/xml; charset=UTF-8');
+})->name('sitemap');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
