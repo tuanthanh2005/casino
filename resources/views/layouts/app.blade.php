@@ -40,7 +40,7 @@
     <!-- Schema.org JSON-LD -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
+    "@@context": "https://schema.org",
       "@type": "WebSite",
       "name": "AquaHub Pro",
             "url": "{{ config('app.url') }}",
@@ -976,6 +976,7 @@
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
             const dropdown = document.querySelector('.nav-dropdown');
+            const chevron = document.getElementById('nav-chevron');
             if (dropdown && !dropdown.contains(e.target)) {
                 document.getElementById('nav-games-dropdown')?.classList.remove('open');
                 if (chevron) chevron.style.transform = '';
