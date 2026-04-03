@@ -32,30 +32,56 @@
 
         <!-- Right: Buttons -->
         <div class="app-banner-buttons">
-            <a href="{{ $androidUrl ?: '#' }}"
-               class="app-dl-btn app-dl-btn--android"
-               {{ ($androidUrl && $androidUrl !== '#') ? 'target="_blank" rel="noopener"' : '' }}>
+            @if($androidUrl && $androidUrl !== '#')
+                <a href="{{ $androidUrl }}"
+                   class="app-dl-btn app-dl-btn--android"
+                   target="_blank" rel="noopener">
+            @else
+                <a href="javascript:void(0)"
+                   class="app-dl-btn app-dl-btn--android"
+                   onclick="appDlNotReady('Android')"
+                   data-coming-soon="1">
+            @endif
                 @if($androidIcon)
                     <img src="{{ asset($androidIcon) }}" class="app-dl-btn-icon" alt="Android">
                 @else
                     <span class="app-dl-btn-emoji">🤖</span>
                 @endif
                 <div class="app-dl-btn-text">
-                    <span class="app-dl-btn-store">Google Play</span>
+                    <span class="app-dl-btn-store">
+                        @if(!$androidUrl || $androidUrl === '#')
+                            Sắp ra mắt
+                        @else
+                            Google Play
+                        @endif
+                    </span>
                     <span class="app-dl-btn-label">{{ $androidLabel }}</span>
                 </div>
             </a>
 
-            <a href="{{ $iosUrl ?: '#' }}"
-               class="app-dl-btn app-dl-btn--ios"
-               {{ ($iosUrl && $iosUrl !== '#') ? 'target="_blank" rel="noopener"' : '' }}>
+            @if($iosUrl && $iosUrl !== '#')
+                <a href="{{ $iosUrl }}"
+                   class="app-dl-btn app-dl-btn--ios"
+                   target="_blank" rel="noopener">
+            @else
+                <a href="javascript:void(0)"
+                   class="app-dl-btn app-dl-btn--ios"
+                   onclick="appDlNotReady('iOS')"
+                   data-coming-soon="1">
+            @endif
                 @if($iosIcon)
                     <img src="{{ asset($iosIcon) }}" class="app-dl-btn-icon" alt="iOS">
                 @else
                     <span class="app-dl-btn-emoji">🍎</span>
                 @endif
                 <div class="app-dl-btn-text">
-                    <span class="app-dl-btn-store">App Store</span>
+                    <span class="app-dl-btn-store">
+                        @if(!$iosUrl || $iosUrl === '#')
+                            Sắp ra mắt
+                        @else
+                            App Store
+                        @endif
+                    </span>
                     <span class="app-dl-btn-label">{{ $iosLabel }}</span>
                 </div>
             </a>
@@ -419,22 +445,18 @@
         const pill   = document.getElementById('app-floating-pill');
         if (!banner) return;
 
-        // Animate out banner
         banner.style.transition = 'max-height 0.4s ease, opacity 0.3s ease, margin 0.4s ease';
         banner.style.maxHeight  = banner.scrollHeight + 'px';
         banner.style.overflow   = 'hidden';
         requestAnimationFrame(() => {
-            banner.style.maxHeight   = '0';
-            banner.style.opacity     = '0';
+            banner.style.maxHeight    = '0';
+            banner.style.opacity      = '0';
             banner.style.marginBottom = '0';
         });
 
         setTimeout(() => {
             banner.style.display = 'none';
-            // Show pill
-            if (pill) {
-                pill.classList.add('visible');
-            }
+            if (pill) pill.classList.add('visible');
         }, 420);
 
         try { sessionStorage.setItem('app_banner_state', 'collapsed'); } catch(e) {}
@@ -446,16 +468,14 @@
         const pill   = document.getElementById('app-floating-pill');
         if (!banner) return;
 
-        // Hide pill
         if (pill) pill.classList.remove('visible');
 
-        // Show banner
-        banner.style.display    = 'block';
-        banner.style.maxHeight  = '0';
-        banner.style.opacity    = '0';
-        banner.style.overflow   = 'hidden';
+        banner.style.display      = 'block';
+        banner.style.maxHeight    = '0';
+        banner.style.opacity      = '0';
+        banner.style.overflow     = 'hidden';
         banner.style.marginBottom = '0';
-        banner.style.transition = 'max-height 0.4s ease, opacity 0.3s ease, margin 0.4s ease';
+        banner.style.transition   = 'max-height 0.4s ease, opacity 0.3s ease, margin 0.4s ease';
 
         requestAnimationFrame(() => {
             banner.style.maxHeight    = '300px';
@@ -469,6 +489,65 @@
         }, 420);
 
         try { sessionStorage.setItem('app_banner_state', 'open'); } catch(e) {}
+    };
+
+    // ── Hiện thông báo "Sắp ra mắt" khi link chưa có ──
+    window.appDlNotReady = function(platform) {
+        // Tạo popup mini
+        const existing = document.getElementById('app-coming-soon-popup');
+        if (existing) existing.remove();
+
+        const popup = document.createElement('div');
+        popup.id = 'app-coming-soon-popup';
+        popup.style.cssText = `
+            position: fixed;
+            bottom: 110px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: linear-gradient(135deg, #1f2937, #111827);
+            border: 1px solid rgba(6,182,212,0.4);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(6,182,212,0.1);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Inter', sans-serif;
+            min-width: 240px;
+            max-width: 320px;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: left;
+        `;
+
+        const icon = platform === 'Android' ? '🤖' : '🍎';
+        popup.innerHTML = `
+            <span style="font-size:2rem;line-height:1">${icon}</span>
+            <div>
+                <div style="font-weight:700;font-size:0.9rem;color:#f9fafb;margin-bottom:0.2rem">
+                    App ${platform} sắp ra mắt!
+                </div>
+                <div style="font-size:0.78rem;color:#9ca3af;line-height:1.4">
+                    Chúng tôi đang hoàn thiện ứng dụng.<br>Vui lòng quay lại sau nhé 🙏
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(popup);
+
+        // Animate in
+        requestAnimationFrame(() => {
+            popup.style.opacity   = '1';
+            popup.style.transform = 'translateX(-50%) translateY(0)';
+        });
+
+        // Auto dismiss sau 3s
+        setTimeout(() => {
+            popup.style.opacity   = '0';
+            popup.style.transform = 'translateX(-50%) translateY(10px)';
+            setTimeout(() => popup.remove(), 300);
+        }, 3000);
     };
 
     // ── Khôi phục trạng thái khi tải trang ──
