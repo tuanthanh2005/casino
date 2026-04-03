@@ -26,8 +26,9 @@
 
             <div style="height:1px; background:var(--border); margin-bottom:1rem;"></div>
 
-            <div style="font-size:0.98rem; line-height:1.85; color:#e8eef8;">
-                {!! nl2br(e($post->content)) !!}
+            <div class="blog-content" style="font-size:0.98rem; line-height:1.85; color:#e8eef8;">
+                @php $hasHtmlContent = $post->content !== strip_tags($post->content); @endphp
+                {!! $hasHtmlContent ? $post->content : nl2br(e($post->content)) !!}
             </div>
         </div>
     </article>
@@ -47,3 +48,60 @@
     @endif
 </div>
 @endsection
+
+@push('styles')
+<style>
+    .blog-content h1,
+    .blog-content h2,
+    .blog-content h3,
+    .blog-content h4,
+    .blog-content h5,
+    .blog-content h6 {
+        color: #f8fbff;
+        margin: 1rem 0 0.55rem;
+        line-height: 1.35;
+    }
+
+    .blog-content p {
+        margin-bottom: 0.85rem;
+    }
+
+    .blog-content ul,
+    .blog-content ol {
+        padding-left: 1.35rem;
+        margin: 0.55rem 0 0.9rem;
+    }
+
+    .blog-content a {
+        color: #67e8f9;
+        text-decoration: underline;
+    }
+
+    .blog-content blockquote {
+        border-left: 3px solid rgba(103, 232, 249, 0.65);
+        padding: 0.4rem 0 0.4rem 0.85rem;
+        margin: 0.85rem 0;
+        color: #c7d6ea;
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .blog-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0.85rem 0;
+    }
+
+    .blog-content table th,
+    .blog-content table td {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 0.5rem 0.6rem;
+        text-align: left;
+    }
+
+    .blog-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+    }
+</style>
+@endpush

@@ -48,7 +48,10 @@
 
             <div class="mb-3">
                 <label class="form-label-admin">Nội dung bài viết <span style="color:var(--danger)">*</span></label>
-                <textarea name="content" rows="15" class="form-control" required placeholder="Viết nội dung chi tiết...">{{ old('content', $post->content ?? '') }}</textarea>
+                <textarea id="blog-content-editor" name="content" rows="15" class="form-control" required placeholder="Viết nội dung chi tiết...">{{ old('content', $post->content ?? '') }}</textarea>
+                <small style="display:block; margin-top:0.45rem; color:var(--text-muted); font-size:0.78rem;">
+                    Có thể dùng tiêu đề, đậm/nghiêng, danh sách, link, blockquote, bảng và chèn ảnh bằng URL.
+                </small>
             </div>
 
             <div class="grid-2 mb-3">
@@ -88,5 +91,54 @@
         margin-bottom: 0.4rem;
         font-weight: 500;
     }
+
+    .ck.ck-editor {
+        color: #111827;
+    }
+
+    .ck.ck-editor__main > .ck-editor__editable {
+        min-height: 340px;
+        background: #f9fafb;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .ck.ck-toolbar {
+        border-radius: 8px 8px 0 0;
+    }
 </style>
+@endpush
+
+@push('admin-scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editorElement = document.getElementById('blog-content-editor');
+
+        if (!editorElement || typeof ClassicEditor === 'undefined') {
+            return;
+        }
+
+        ClassicEditor.create(editorElement, {
+            toolbar: [
+                'heading', '|',
+                'bold', 'italic', 'underline', 'strikethrough', '|',
+                'bulletedList', 'numberedList', 'todoList', '|',
+                'link', 'blockQuote', 'insertTable', 'imageInsert', '|',
+                'undo', 'redo'
+            ],
+            link: {
+                addTargetToExternalLinks: true,
+                defaultProtocol: 'https://'
+            },
+            image: {
+                toolbar: ['imageTextAlternative', 'imageStyle:inline', 'imageStyle:block', 'imageStyle:side']
+            },
+            table: {
+                contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
+            }
+        }).catch(function (error) {
+            console.error('CKEditor init failed:', error);
+        });
+    });
+</script>
 @endpush
