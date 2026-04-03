@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\GameSetting;
 use App\Models\MiniGameLog;
+use App\Services\GameRiskAlertService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -118,6 +119,8 @@ class MiniGameController extends Controller
                 'details'    => ['prize_index' => $prizeIndex, 'mult' => $prize['mult']],
             ]);
         });
+
+        GameRiskAlertService::notifyIfNeeded($user, 'spin', $amount, $payout, $profit, $won);
 
         $newBalance = number_format((float) $user->fresh()->balance_point, 2);
 
@@ -252,6 +255,8 @@ class MiniGameController extends Controller
                 'details'    => ['dice' => [$d1, $d2, $d3], 'total' => $total, 'result' => $result, 'triplet' => $isTriplet, 'bet_type' => $betType],
             ]);
         });
+
+        GameRiskAlertService::notifyIfNeeded($user, 'dice', $amount, $payout, $profit, $won);
 
         $newBalance  = number_format((float) $user->fresh()->balance_point, 2);
         $resultLabel = $isTriplet ? '😱 Bão! (Banker thắng)' : ($result === 'tai' ? '🔴 TÀI' : '🔵 XỈU');
@@ -467,6 +472,8 @@ class MiniGameController extends Controller
             ]);
         });
 
+        GameRiskAlertService::notifyIfNeeded($user, 'rps', $amount, $payout, $profit, $won);
+
         $newBalance = number_format((float) $user->fresh()->balance_point, 2);
 
         return response()->json([
@@ -549,4 +556,5 @@ class MiniGameController extends Controller
             default => 'keo',
         };
     }
+
 }

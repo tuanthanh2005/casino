@@ -13,6 +13,7 @@ use App\Models\MiniGameLog;
 use App\Models\NavOrder;
 use App\Models\User;
 use App\Models\WithdrawalOrder;
+use App\Services\GameRiskAlertService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -437,7 +438,9 @@ class AdminController extends Controller
      */
     private function processSession(GameSession $session, float $endPrice): void
     {
-        DB::transaction(function () use ($session, $endPrice) {
+        $alertPayloads = [];
+
+        DB::transaction(function () use ($session, $endPrice, &$alertPayloads) {
             $session->update([
                 'end_price' => $endPrice,
                 'end_time' => now(),
@@ -454,12 +457,31 @@ class AdminController extends Controller
                     $profit = round($bet->bet_amount * 1.95, 2);
                     $bet->update(['status' => 'won', 'profit' => $profit]);
                     $bet->user->increment('balance_point', $profit);
+
+                    $alertPayloads[] = [
+                        'user' => $bet->user,
+                        'amount' => (float) $bet->bet_amount,
+                        'payout' => (float) $profit,
+                        'profit' => (float) $profit - (float) $bet->bet_amount,
+                        'won' => true,
+                    ];
                 } else {
                     // Thua: mất vốn (đã trừ lúc đặt)
                     $bet->update(['status' => 'lost', 'profit' => 0]);
                 }
             }
         });
+
+        foreach ($alertPayloads as $payload) {
+            GameRiskAlertService::notifyIfNeeded(
+                $payload['user'],
+                'btc',
+                $payload['amount'],
+                $payload['payout'],
+                $payload['profit'],
+                $payload['won']
+            );
+        }
     }
 
     /**

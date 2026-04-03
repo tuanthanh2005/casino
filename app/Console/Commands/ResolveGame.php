@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Bet;
 use App\Models\GameSession;
+use App\Services\GameRiskAlertService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -57,7 +58,9 @@ class ResolveGame extends Command
 
     private function resolveSession(GameSession $session, float $endPrice): void
     {
-        DB::transaction(function () use ($session, $endPrice) {
+        $alertPayloads = [];
+
+        DB::transaction(function () use ($session, $endPrice, &$alertPayloads) {
             $session->update([
                 'end_price' => $endPrice,
                 'end_time' => now(),
@@ -81,6 +84,14 @@ class ResolveGame extends Command
                     $profit = round($bet->bet_amount * 1.95, 2);
                     $bet->update(['status' => 'won', 'profit' => $profit]);
                     $bet->user->increment('balance_point', $profit);
+
+                    $alertPayloads[] = [
+                        'user' => $bet->user,
+                        'amount' => (float) $bet->bet_amount,
+                        'payout' => (float) $profit,
+                        'profit' => (float) $profit - (float) $bet->bet_amount,
+                        'won' => true,
+                    ];
                     $wins++;
                 } else {
                     // THUA: mất vốn (đã trừ lúc đặt)
@@ -91,6 +102,17 @@ class ResolveGame extends Command
 
             $this->info("  ✓ {$wins} người thắng, {$losses} người thua");
         });
+
+        foreach ($alertPayloads as $payload) {
+            GameRiskAlertService::notifyIfNeeded(
+                $payload['user'],
+                'btc',
+                $payload['amount'],
+                $payload['payout'],
+                $payload['profit'],
+                $payload['won']
+            );
+        }
     }
 
     private function getBtcPrice(): float
