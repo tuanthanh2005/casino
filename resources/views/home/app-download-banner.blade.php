@@ -55,7 +55,7 @@
                     @endif
                     <div class="app-dl-btn-text">
                         <span class="app-dl-btn-store" id="android-store-label">Cài vào máy</span>
-                        <span class="app-dl-btn-label">{{ $androidLabel }}</span>
+                        <span class="app-dl-btn-label" id="android-main-label">{{ $androidLabel }}</span>
                     </div>
                 </button>
             @endif
@@ -92,6 +92,54 @@
         {{-- Thu gọn --}}
         <button class="app-banner-close" onclick="collapseAppBanner()" aria-label="Thu gọn">
             <i class="bi bi-chevron-up"></i>
+        </button>
+    </div>
+</div>
+
+{{-- ═══════════════ DESKTOP GUIDE MODAL ═══════════════ --}}
+<div class="ios-guide-overlay" id="desktop-guide-overlay" onclick="closeDesktopGuide()">
+    <div class="ios-guide-card" onclick="event.stopPropagation()">
+        <button class="ios-guide-close" onclick="closeDesktopGuide()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="ios-guide-header">
+            <span style="font-size:2.2rem">🖥️</span>
+            <div>
+                <div class="ios-guide-title">Thêm AquaHub ra Desktop</div>
+                <div class="ios-guide-sub">Mở nhanh như app, có icon riêng ngoài màn hình</div>
+            </div>
+        </div>
+        <div class="ios-guide-steps">
+            <div class="ios-step">
+                <div class="ios-step-num">1</div>
+                <div class="ios-step-text">
+                    Mở trang bằng <strong>Chrome</strong> hoặc <strong>Microsoft Edge</strong>
+                    <span class="ios-step-note">Khuyến nghị dùng bản mới nhất</span>
+                </div>
+            </div>
+            <div class="ios-step">
+                <div class="ios-step-num">2</div>
+                <div class="ios-step-text">
+                    Bấm nút <strong>Cài vào máy</strong> trên banner
+                    <span class="ios-step-note">Nếu trình duyệt hỗ trợ, hộp thoại cài sẽ hiện ngay</span>
+                </div>
+            </div>
+            <div class="ios-step">
+                <div class="ios-step-num">3</div>
+                <div class="ios-step-text">
+                    Nếu chưa thấy popup, mở menu trình duyệt và chọn:
+                    <span class="ios-step-note">Chrome: <strong>Install AquaHub...</strong> | Edge: <strong>Apps → Install this site as an app</strong></span>
+                </div>
+            </div>
+            <div class="ios-step">
+                <div class="ios-step-num">4</div>
+                <div class="ios-step-text">
+                    Xác nhận cài đặt, icon AquaHub sẽ xuất hiện trên Desktop và Start Menu
+                </div>
+            </div>
+        </div>
+        <button class="ios-guide-done" onclick="closeDesktopGuide()">
+            <i class="bi bi-check-circle"></i> Đã hiểu, đóng lại
         </button>
     </div>
 </div>
@@ -437,6 +485,39 @@
 
 <script>
     (function () {
+        function isIosDevice() {
+            const ua = navigator.userAgent || navigator.vendor || '';
+            return /iPad|iPhone|iPod/.test(ua);
+        }
+
+        function isMobileDevice() {
+            return window.matchMedia('(max-width: 768px)').matches;
+        }
+
+        function isDesktopDevice() {
+            return !isMobileDevice() && !isIosDevice();
+        }
+
+        function isStandaloneMode() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+
+        function updateInstallCtaCopy() {
+            const storeLabelEl = document.getElementById('android-store-label');
+            const mainLabelEl = document.getElementById('android-main-label');
+
+            if (!storeLabelEl || !mainLabelEl) return;
+
+            if (isDesktopDevice()) {
+                storeLabelEl.textContent = 'Desktop app';
+                mainLabelEl.textContent = 'Thêm icon Desktop';
+                return;
+            }
+
+            storeLabelEl.textContent = 'Cài vào máy';
+            mainLabelEl.textContent = @json($androidLabel);
+        }
+
         window.collapseAppBanner = function () {
             const banner = document.getElementById('app-download-banner');
             const mini = document.getElementById('app-mini-bar');
@@ -475,11 +556,40 @@
             document.getElementById('ios-guide-overlay')?.classList.add('open');
         };
 
+        window.showDesktopGuide = function () {
+            document.getElementById('desktop-guide-overlay')?.classList.add('open');
+        };
+
         window.closeIosGuide = function () {
             document.getElementById('ios-guide-overlay')?.classList.remove('open');
         };
 
+        window.closeDesktopGuide = function () {
+            document.getElementById('desktop-guide-overlay')?.classList.remove('open');
+        };
+
+        // Được gọi từ layout khi không hiện được beforeinstallprompt.
+        window.showPwaGuide = function () {
+            if (isIosDevice()) {
+                window.showIosGuide();
+                return;
+            }
+
+            window.showDesktopGuide();
+        };
+
         document.addEventListener('DOMContentLoaded', function () {
+            updateInstallCtaCopy();
+
+            // Khi app đã cài ở chế độ standalone thì ẩn banner cài đặt.
+            if (isStandaloneMode()) {
+                const banner = document.getElementById('app-download-banner');
+                const mini = document.getElementById('app-mini-bar');
+                if (banner) banner.style.display = 'none';
+                if (mini) mini.classList.remove('visible');
+                return;
+            }
+
             if (sessionStorage.getItem('app_banner_state') === 'collapsed') {
                 const banner = document.getElementById('app-download-banner');
                 const mini = document.getElementById('app-mini-bar');
