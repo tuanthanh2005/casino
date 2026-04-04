@@ -159,7 +159,7 @@ class NavAdminController extends Controller
 
     public function saveSettings(Request $request)
     {
-        $fields = ['bank_name', 'bank_account', 'bank_owner', 'bank_bin', 'pt_enabled', 'bank_enabled'];
+        $fields = ['bank_name', 'bank_account', 'bank_owner', 'bank_bin', 'pt_enabled', 'bank_enabled', 'sepay_api_key'];
         foreach ($fields as $field) {
             NavSetting::set($field, $request->input($field, ''));
         }

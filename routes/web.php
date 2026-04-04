@@ -387,3 +387,5 @@ Route::get('/api-test', function () {
     }
 });
 
+// Webhook Sepay
+Route::post('/webhook/sepay', [\App\Http\Controllers\SepayController::class, 'webhook'])->name('webhook.sepay');

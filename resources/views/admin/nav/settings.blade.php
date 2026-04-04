@@ -70,6 +70,22 @@
         </div>
     </div>
 
+    <!-- Sepay API Key -->
+    <div class="card mb-3" style="margin-bottom:1.5rem">
+        <div class="card-header"><i class="bi bi-robot" style="color:#69C9D0"></i> Cấu Hình Sepay (Nạp Tự Động)</div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:0.4rem">Sepay API Key (Khóa bảo mật)</label>
+                <input type="text" name="sepay_api_key" class="form-control" value="{{ $settings['sepay_api_key'] ?? '' }}" placeholder="Nhập API Key... (ví dụ: TokenCuaToi123)">
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem">
+                    1. Bạn tự nghĩ ra một chuỗi bất kỳ và dán vào đây.<br>
+                    2. Copy chuỗi đó dán vào phần "API Key" trên Sepay.<br>
+                    3. Trong ô "Gọi đến URL" ở Sepay, hãy điền: <strong style="color:var(--primary)">{{ url('/webhook/sepay') }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <button type="submit" class="btn btn-primary" style="width:100%;padding:0.875rem;font-size:0.95rem">
         <i class="bi bi-save"></i> Lưu Cài Đặt
     </button>
