@@ -2,31 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BlogPost;
+use App\Models\Post;
+use App\Models\Category;
+use Illuminate\Http\Request;
 
 class BlogController extends Controller
 {
     public function index()
     {
-        $posts = BlogPost::query()
-            ->published()
+        $posts = Post::with('category', 'author')
+            ->where('status', 'published')
             ->latest('published_at')
-            ->paginate(9);
-
+            ->paginate(12);
+        
         return view('blog.index', compact('posts'));
     }
 
-    public function show(BlogPost $post)
+    public function show($slug)
     {
-        abort_unless($post->is_published && $post->published_at && $post->published_at->lte(now()), 404);
+        $post = Post::with('category', 'author', 'tags', 'faqs')
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->firstOrFail();
 
-        $relatedPosts = BlogPost::query()
-            ->published()
+        $related_posts = Post::with('category')
+            ->where('category_id', $post->category_id)
             ->where('id', '!=', $post->id)
-            ->latest('published_at')
-            ->limit(4)
+            ->where('status', 'published')
+            ->take(3)
             ->get();
+        
+        return view('blog.show', compact('post', 'related_posts'));
+    }
 
-        return view('blog.show', compact('post', 'relatedPosts'));
+    public function category($slug)
+    {
+        $category = Category::where('slug', $slug)->firstOrFail();
+        $posts = Post::with('category', 'author')
+            ->where('category_id', $category->id)
+            ->where('status', 'published')
+            ->latest('published_at')
+            ->paginate(12);
+        
+        return view('blog.category', compact('category', 'posts'));
     }
 }
