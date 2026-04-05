@@ -97,7 +97,8 @@
 
         <nav>
             <a href="/admin" class="nav-item-admin {{ request()->is('admin') ? 'active' : '' }}">Dashboard</a>
-            <a href="/admin/posts" class="nav-item-admin {{ request()->is('admin/posts*') ? 'active' : '' }}">All Posts</a>
+            <a href="{{ route('admin.posts.index') }}" class="nav-item-admin {{ request()->is('admin/posts*') ? 'active' : '' }}">All Posts</a>
+            <a href="{{ route('admin.messages.index') }}" class="nav-item-admin {{ request()->is('admin/messages*') ? 'active' : '' }}">Support Messages</a>
             <a href="/admin/categories" class="nav-item-admin {{ request()->is('admin/categories*') ? 'active' : '' }}">Categories</a>
             <a href="/admin/tags" class="nav-item-admin {{ request()->is('admin/tags*') ? 'active' : '' }}">Tags</a>
             <div style="margin: 2rem 1rem 1rem; font-size: 0.75rem; text-transform: uppercase; color: #475569; letter-spacing: 0.1em;">External</div>
