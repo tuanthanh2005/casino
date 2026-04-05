@@ -68,6 +68,14 @@
             </div>
 
             <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; color: #475569; margin-bottom: 0.5rem; font-size: 0.75rem;">Language</label>
+                <select name="lang" style="width: 100%; padding: 0.625rem; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.8125rem;" required>
+                    <option value="en" {{ (old('lang', $post->lang ?? 'en') == 'en') ? 'selected' : '' }}>English</option>
+                    <option value="vi" {{ (old('lang', $post->lang ?? '') == 'vi') ? 'selected' : '' }}>Tiếng Việt</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">
                     <input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $post->is_featured ?? false) ? 'checked' : '' }}>
                     Make Featured Post

@@ -20,6 +20,7 @@ class Post extends Model
         'featured_image',
         'category_id',
         'author_id',
+        'lang',
         'meta_title',
         'meta_description',
         'is_featured',

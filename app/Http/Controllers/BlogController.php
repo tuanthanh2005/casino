@@ -12,6 +12,7 @@ class BlogController extends Controller
     {
         $posts = Post::with('category', 'author')
             ->where('status', 'published')
+            ->where('lang', app()->getLocale())
             ->latest('published_at')
             ->paginate(12);
         
@@ -29,6 +30,7 @@ class BlogController extends Controller
             ->where('category_id', $post->category_id)
             ->where('id', '!=', $post->id)
             ->where('status', 'published')
+            ->where('lang', app()->getLocale())
             ->take(3)
             ->get();
         
@@ -41,6 +43,7 @@ class BlogController extends Controller
         $posts = Post::with('category', 'author')
             ->where('category_id', $category->id)
             ->where('status', 'published')
+            ->where('lang', app()->getLocale())
             ->latest('published_at')
             ->paginate(12);
         

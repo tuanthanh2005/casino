@@ -20,7 +20,10 @@ class PostController extends Controller
 
     public function create()
     {
-        $categories = Category::all();
+        $categories = Category::where('lang', app()->getLocale())->get();
+        if ($categories->isEmpty()) {
+            $categories = Category::all(); // Fallback if no specific categories for this lang
+        }
         $tags = Tag::all();
         return view('admin.posts.form', compact('categories', 'tags'));
     }
@@ -38,6 +41,7 @@ class PostController extends Controller
             'featured_image' => 'nullable|image|max:2048',
             'meta_title' => 'nullable|max:255',
             'meta_description' => 'nullable',
+            'lang' => 'required|in:en,vi',
         ]);
 
         if (empty($validated['slug'])) {
@@ -69,7 +73,7 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
-        $categories = Category::all();
+        $categories = Category::where('lang', $post->lang)->get();
         $tags = Tag::all();
         return view('admin.posts.form', compact('post', 'categories', 'tags'));
     }
@@ -87,6 +91,7 @@ class PostController extends Controller
             'featured_image' => 'nullable|image|max:2048',
             'meta_title' => 'nullable|max:255',
             'meta_description' => 'nullable',
+            'lang' => 'required|in:en,vi',
         ]);
 
         if ($request->hasFile('featured_image')) {

@@ -13,24 +13,32 @@ class HomeController extends Controller
         $featured_posts = Post::with('category')
             ->where('is_featured', true)
             ->where('status', 'published')
+            ->where('lang', app()->getLocale())
             ->latest('published_at')
             ->take(3)
             ->get();
 
         $latest_posts = Post::with('category')
             ->where('status', 'published')
+            ->where('lang', app()->getLocale())
             ->latest('published_at')
             ->take(6)
             ->get();
 
         $categories = Category::withCount('posts')
+            ->where('lang', app()->getLocale())
             ->take(4)
             ->get();
+# Add fallback for categories if current lang is empty
+if ($categories->isEmpty()) {
+    $categories = Category::withCount('posts')->take(4)->get();
+}
 
-        $review_category = Category::where('slug', 'product-reviews')->first();
+        $review_category = Category::where('slug', 'product-reviews')->where('lang', app()->getLocale())->first();
         $reviews = $review_category ? 
             Post::where('category_id', $review_category->id)
                 ->where('status', 'published')
+                ->where('lang', app()->getLocale())
                 ->latest('published_at')
                 ->take(4)
                 ->get() : collect();
