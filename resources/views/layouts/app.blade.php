@@ -4,6 +4,7 @@
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <title>@yield('title', 'Aquahub.pro')</title>
+<link rel="icon" type="image/png" href="{{ asset('av.png') }}">
 <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css' rel='stylesheet'>
 <link rel='stylesheet' href='{{ asset('css/style.css') }}'>
 @stack('styles')
@@ -11,7 +12,10 @@
 <body>
 <nav class='navbar navbar-expand-lg navbar-dark bg-dark'>
 <div class='container'>
-<a class='navbar-brand' href='/'>AQUAHUB</a>
+<a class='navbar-brand' href='/'>
+<img src="{{ asset('av.png') }}" alt="Aquahub Logo" style="height: 32px; width: 32px; border-radius: 6px;">
+AQUAHUB
+</a>
 </div>
 </nav>
 <main class='py-5'>

@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('page_title', 'Dashboard') - Aquahub Admin</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('av.png') }}">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,9 +90,9 @@
 
 <body>
     <div class="admin-sidebar">
-        <div style="margin-bottom: 3rem; padding-left: 1rem;">
-            <h1 style="font-size: 1.25rem; font-weight: 800; color: white;">AQUAHUB<span style="color: #38bdf8;">.PRO</span></h1>
-            <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">Admin Dashboard</p>
+        <div style="margin-bottom: 3rem; padding-left: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+            <img src="{{ asset('av.png') }}" style="width: 32px; height: 32px; border-radius: 6px;">
+            <h1 style="font-size: 1.25rem; font-weight: 800; color: white; margin-bottom: 0;">AQUAHUB</h1>
         </div>
 
         <nav>

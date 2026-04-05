@@ -2,7 +2,7 @@
 
 @section('title', $post->meta_title ?: $post->title . ' - Aquahub.pro')
 @section('meta_description', $post->meta_description ?: $post->excerpt)
-@section('meta_image', $post->featured_image ? asset('storage/' . $post->featured_image) : asset('images/og-default.jpg'))
+@section('meta_image', $post->featured_image ? asset('uploads/posts/' . $post->featured_image) : asset('images/og-default.jpg'))
 
 @section('content')
 <div style="background: white; padding: 4rem 0 2rem;">
@@ -26,7 +26,7 @@
     <!-- Main Content -->
     <article style="max-width: 800px; min-width: 0;">
         @if($post->featured_image)
-            <img src="{{ asset('storage/' . $post->featured_image) }}" alt="{{ $post->title }}" style="width: 100%; border-radius: 12px; margin-bottom: 3rem; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);">
+            <img src="{{ asset('uploads/posts/' . $post->featured_image) }}" alt="{{ $post->title }}" style="width: 100%; border-radius: 12px; margin-bottom: 3rem; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);">
         @endif
 
         <div id="toc-container" style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 3rem;">
@@ -82,7 +82,7 @@
             <a href="/blog/{{ $related->slug }}" style="display: flex; gap: 1rem; text-decoration: none;">
                 <div style="width: 60px; height: 60px; background: #e2e8f0; border-radius: 4px; overflow: hidden; flex-shrink: 0;">
                     @if($related->featured_image)
-                        <img src="{{ asset('storage/' . $related->featured_image) }}" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="{{ asset('uploads/posts/' . $related->featured_image) }}" alt="" style="width: 100%; height: 100%; object-fit: cover;">
                     @endif
                 </div>
                 <div>
@@ -100,7 +100,7 @@
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": "{{ $post->title }}",
-  "image": ["{{ $post->featured_image ? asset('storage/' . $post->featured_image) : asset('images/og-default.jpg') }}"],
+  "image": ["{{ $post->featured_image ? asset('uploads/posts/' . $post->featured_image) : asset('images/og-default.jpg') }}"],
   "datePublished": "{{ $post->published_at?->toIso8601String() }}",
   "dateModified": "{{ $post->updated_at?->toIso8601String() }}",
   "author": [{

@@ -103,7 +103,7 @@
         <div class="card" style="padding: 1.5rem;">
             <h3 style="font-size: 0.875rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 1.25rem;">Featured Image</h3>
             @if($isEdit && $post->featured_image)
-                <img src="{{ asset('storage/' . $post->featured_image) }}" style="width: 100%; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
+                <img src="{{ asset('uploads/posts/' . $post->featured_image) }}" style="width: 100%; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
             @endif
             <input type="file" name="featured_image" style="font-size: 0.75rem; color: #64748b; width: 100%;">
             <p style="font-size: 0.625rem; color: #94a3b8; margin-top: 0.5rem;">Recommended: 1200x630px. Max 2MB.</p>

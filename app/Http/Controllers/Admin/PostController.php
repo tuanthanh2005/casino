@@ -45,8 +45,10 @@ class PostController extends Controller
         }
 
         if ($request->hasFile('featured_image')) {
-            $path = $request->file('featured_image')->store('posts', 'public');
-            $validated['featured_image'] = $path;
+            $image = $request->file('featured_image');
+            $fileName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/posts'), $fileName);
+            $validated['featured_image'] = $fileName;
         }
 
         $validated['author_id'] = auth()->id() ?? 1; // Default to ID 1 if not logged in
@@ -88,11 +90,13 @@ class PostController extends Controller
         ]);
 
         if ($request->hasFile('featured_image')) {
-            if ($post->featured_image) {
-                Storage::disk('public')->delete($post->featured_image);
+            if ($post->featured_image && file_exists(public_path('uploads/posts/' . $post->featured_image))) {
+                unlink(public_path('uploads/posts/' . $post->featured_image));
             }
-            $path = $request->file('featured_image')->store('posts', 'public');
-            $validated['featured_image'] = $path;
+            $image = $request->file('featured_image');
+            $fileName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/posts'), $fileName);
+            $validated['featured_image'] = $fileName;
         }
 
         if ($validated['status'] === 'published' && !$post->published_at) {
@@ -112,8 +116,8 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
-        if ($post->featured_image) {
-            Storage::disk('public')->delete($post->featured_image);
+        if ($post->featured_image && file_exists(public_path('uploads/posts/' . $post->featured_image))) {
+            unlink(public_path('uploads/posts/' . $post->featured_image));
         }
         $post->delete();
         return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully.');

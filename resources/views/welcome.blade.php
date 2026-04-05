@@ -32,7 +32,7 @@
             <article class="card" style="display: flex; flex-direction: column; transition: transform 0.3s ease;">
                 <div style="height: 200px; background: #e2e8f0; overflow: hidden; position: relative;">
                     @if($post->featured_image)
-                        <img src="{{ asset('storage/' . $post->featured_image) }}" alt="{{ $post->title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="{{ asset('uploads/posts/' . $post->featured_image) }}" alt="{{ $post->title }}" style="width: 100%; height: 100%; object-fit: cover;">
                     @else
                         <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);">
                             <span style="font-size: 3rem;">🐟</span>
