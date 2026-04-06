@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 
-@section('page_title', 'Country Management')
+@section('page_title', __('Country Management'))
 
 @section('header_actions')
 <a href="{{ route('admin.countries.create') }}" class="btn btn-primary px-4 py-2 fw-bold" style="border-radius: 99px; background: #0f172a; border: none;">
-    Add New Country
+    {{ __('Add New Country') }}
 </a>
 @endsection
 
@@ -14,11 +14,11 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="bg-light">
                 <tr>
-                    <th class="ps-4 py-3 text-secondary small text-uppercase">Icon</th>
-                    <th class="py-3 text-secondary small text-uppercase">Country Name</th>
-                    <th class="py-3 text-secondary small text-uppercase text-center">Code</th>
-                    <th class="py-3 text-secondary small text-uppercase text-center">Status</th>
-                    <th class="pe-4 py-3 text-secondary small text-uppercase text-end">Actions</th>
+                    <th class="ps-4 py-3 text-secondary small text-uppercase">{{ __('Icon') }}</th>
+                    <th class="py-3 text-secondary small text-uppercase">{{ __('Country Name') }}</th>
+                    <th class="py-3 text-secondary small text-uppercase text-center">{{ __('Code') }}</th>
+                    <th class="py-3 text-secondary small text-uppercase text-center">{{ __('Status') }}</th>
+                    <th class="pe-4 py-3 text-secondary small text-uppercase text-end">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,19 +39,19 @@
                     </td>
                     <td class="text-center">
                         <span class="badge {{ $country->status ? 'bg-success' : 'bg-secondary' }}" style="font-size: 0.65rem;">
-                            {{ $country->status ? 'ACTIVE' : 'INACTIVE' }}
+                            {{ $country->status ? __('ACTIVE') : __('INACTIVE') }}
                         </span>
                     </td>
                     <td class="pe-4 text-end">
                         <div class="d-flex justify-content-end gap-2">
                             <a href="{{ route('admin.countries.edit', $country) }}" class="btn btn-sm btn-outline-dark border-0 bg-light rounded-3">
-                                Edit
+                                {{ __('Edit') }}
                             </a>
-                            <form action="{{ route('admin.countries.destroy', $country) }}" method="POST" onsubmit="return confirm('Are you sure?')">
+                            <form action="{{ route('admin.countries.destroy', $country) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure?') }}')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-outline-danger border-0 bg-light rounded-3">
-                                    Delete
+                                    {{ __('Delete') }}
                                 </button>
                             </form>
                         </div>

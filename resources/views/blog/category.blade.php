@@ -5,9 +5,9 @@
 @section('content')
 <div class="py-5" style="background: white; border-bottom: 1px solid var(--border);">
     <div class="container text-center py-5 px-4">
-        <span class="badge mb-4">RESOURCE HUB</span>
+        <span class="badge mb-4">{{ __('RESOURCE HUB') }}</span>
         <h1 class="mx-auto fw-black" style="font-size: 4rem; letter-spacing: -0.05em; line-height: 1.05;">{{ $category->name }}</h1>
-        <p class="mx-auto mt-4 text-secondary" style="max-width: 600px; line-height: 1.7; font-size: 1.125rem;">{{ $category->description ?? 'Expertly curated guides and step-by-step tutorials to help you master ' . $category->name . ' without the stress.' }}</p>
+        <p class="mx-auto mt-4 text-secondary" style="max-width: 600px; line-height: 1.7; font-size: 1.125rem;">{{ $category->description ?? __('Expertly curated guides and step-by-step tutorials to help you master ') . $category->name . __(' without the stress.') }}</p>
     </div>
 </div>
 
@@ -29,7 +29,7 @@
                     </h3>
                     <p class="card-excerpt" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ $post->excerpt }}</p>
                     <div class="mt-auto d-flex justify-content-between align-items-center">
-                        <span style="font-size: 0.7rem; font-weight: 600; color: #94a3b8; text-transform: uppercase;">{{ $post->published_at?->format('F j, Y') ?? 'DRAFT' }}</span>
+                        <span style="font-size: 0.7rem; font-weight: 600; color: #94a3b8; text-transform: uppercase;">{{ $post->published_at?->format('F j, Y') ?? __('DRAFT') }}</span>
                     </div>
                 </div>
             </article>

@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
-@section('title', 'Search results for: ' . ($query ?: 'Search aquarium guides'))
+@section('title', __('Search results for') . ': ' . ($query ?: __('Search guides...')))
 
 @section('content')
 <div style="background: #f8fafc; padding: 4rem 0 3rem; border-bottom: 1px solid #e2e8f0;">
     <div class="container" style="max-width: 800px; text-align: center;">
-        <h1 style="font-size: 2.5rem; margin-bottom: 2rem;">Search Results</h1>
+        <h1 style="font-size: 2.5rem; margin-bottom: 2rem;">{{ __('Search Results') }}</h1>
         <form action="/search" method="GET" style="display: flex; gap: 1rem; max-width: 600px; margin: 0 auto;">
-            <input type="text" name="q" value="{{ $query }}" placeholder="Search our aquarium guides..." style="flex-grow: 1; padding: 1rem 1.5rem; border: 1px solid #cbd5e1; border-radius: 9999px; font-size: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);">
-            <button type="submit" class="btn btn-primary" style="padding: 0 2rem; border-radius: 9999px;">Search</button>
+            <input type="text" name="q" value="{{ $query }}" placeholder="{{ __('Search our aquarium guides...') }}" style="flex-grow: 1; padding: 1rem 1.5rem; border: 1px solid #cbd5e1; border-radius: 9999px; font-size: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);">
+            <button type="submit" class="btn btn-primary" style="padding: 0 2rem; border-radius: 9999px;">{{ __('Search') }}</button>
         </form>
         @if($query)
-            <p style="margin-top: 2rem; color: #64748b; font-size: 0.875rem;">Showing results for: <strong>"{{ $query }}"</strong></p>
+            <p style="margin-top: 2rem; color: #64748b; font-size: 0.875rem;">{{ __('Showing results for') }}: <strong>"{{ $query }}"</strong></p>
         @endif
     </div>
 </div>
@@ -46,8 +46,8 @@
         @elseif($query)
             <div style="text-align: center; padding: 5rem 0;">
                 <div style="font-size: 4rem; margin-bottom: 2rem;">🏖️</div>
-                <h3 style="margin-bottom: 1rem;">No results found for "{{ $query }}"</h3>
-                <p style="color: #64748b; margin-bottom: 2rem;">Try different keywords or browse our categories instead.</p>
+                <h3 style="margin-bottom: 1rem;">{{ __('No results found') }} "{{ $query }}"</h3>
+                <p style="color: #64748b; margin-bottom: 2rem;">{{ __('Try different keywords or browse our categories instead.') }}</p>
                 <div style="display: flex; gap: 1rem; justify-content: center;">
                     @foreach(\App\Models\Category::take(3)->get() as $cat)
                         <a href="/category/{{ $cat->slug }}" class="btn" style="background: #f1f5f9; color: #475569; font-size: 0.8125rem;">{{ $cat->name }}</a>
@@ -56,7 +56,7 @@
             </div>
         @else
             <div style="text-align: center; padding: 5rem 0;">
-                <h3 style="color: #64748b;">Enter a keyword to search our guides.</h3>
+                <h3 style="color: #64748b;">{{ __('Enter a keyword to search our guides.') }}</h3>
             </div>
         @endif
     </div>

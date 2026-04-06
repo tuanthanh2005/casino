@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('page_title', 'Dashboard') - Aquahub Admin</title>
+    <title>@yield('page_title', __('Dashboard')) - Aquahub Admin</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('av.png') }}">
@@ -96,21 +96,21 @@
         </div>
 
         <nav>
-            <a href="/admin" class="nav-item-admin {{ request()->is('admin') ? 'active' : '' }}">Dashboard</a>
-            <a href="{{ route('admin.posts.index') }}" class="nav-item-admin {{ request()->is('admin/posts*') ? 'active' : '' }}">All Posts</a>
+            <a href="/admin" class="nav-item-admin {{ request()->is('admin') ? 'active' : '' }}">{{ __('Dashboard') }}</a>
+            <a href="{{ route('admin.posts.index') }}" class="nav-item-admin {{ request()->is('admin/posts*') ? 'active' : '' }}">{{ __('All Posts') }}</a>
             <a href="{{ route('admin.messages.index') }}" class="nav-item-admin {{ request()->is('admin/messages*') ? 'active' : '' }} d-flex justify-content-between align-items-center">
-                <span>Support Messages</span>
+                <span>{{ __('Support Messages') }}</span>
                 @if(($unread_admin_messages ?? 0) > 0)
                     <span class="badge bg-danger rounded-pill" style="font-size: 0.65rem;">{{ $unread_admin_messages }}</span>
                 @endif
             </a>
-            <a href="{{ route('admin.settings.footer') }}" class="nav-item-admin {{ request()->is('admin/settings/footer*') ? 'active' : '' }}">Footer Settings</a>
-            <a href="{{ route('admin.countries.index') }}" class="nav-item-admin {{ request()->is('admin/countries*') ? 'active' : '' }}">Countries Management</a>
-            <a href="/admin/categories" class="nav-item-admin {{ request()->is('admin/categories*') ? 'active' : '' }}">Categories</a>
-            <a href="/admin/tags" class="nav-item-admin {{ request()->is('admin/tags*') ? 'active' : '' }}">Tags</a>
-            <div style="margin: 2rem 1rem 1rem; font-size: 0.75rem; text-transform: uppercase; color: #475569; letter-spacing: 0.1em;">External</div>
-            <a href="/" target="_blank" class="nav-item-admin">Visit Website</a>
-            <a href="/logout" class="nav-item-admin" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="color: #fca5a5;">Logout</a>
+            <a href="{{ route('admin.settings.footer') }}" class="nav-item-admin {{ request()->is('admin/settings/footer*') ? 'active' : '' }}">{{ __('Footer Settings') }}</a>
+            <a href="{{ route('admin.countries.index') }}" class="nav-item-admin {{ request()->is('admin/countries*') ? 'active' : '' }}">{{ __('Countries Management') }}</a>
+            <a href="/admin/categories" class="nav-item-admin {{ request()->is('admin/categories*') ? 'active' : '' }}">{{ __('Categories') }}</a>
+            <a href="/admin/tags" class="nav-item-admin {{ request()->is('admin/tags*') ? 'active' : '' }}">{{ __('Tags') }}</a>
+            <div style="margin: 2rem 1rem 1rem; font-size: 0.75rem; text-transform: uppercase; color: #475569; letter-spacing: 0.1em;">{{ __('External') }}</div>
+            <a href="/" target="_blank" class="nav-item-admin">{{ __('Visit Website') }}</a>
+            <a href="/logout" class="nav-item-admin" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="color: #fca5a5;">{{ __('Log Out') }}</a>
 
             <form id="logout-form" action="/logout" method="POST" style="display: none;">
                 @csrf

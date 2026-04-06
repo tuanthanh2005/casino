@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 
-@section('page_title', 'Category Management')
+@section('page_title', __('Category Management'))
 
 @section('header_actions')
 <a href="{{ route('admin.categories.create') }}" class="btn btn-primary px-4 py-2 fw-bold" style="border-radius: 99px; background: #0f172a; border: none;">
-    Create New Category
+    {{ __('Create New Category') }}
 </a>
 @endsection
 
@@ -14,11 +14,11 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="bg-light">
                 <tr>
-                    <th class="ps-4 py-3 text-secondary small text-uppercase">Language</th>
-                    <th class="py-3 text-secondary small text-uppercase">Name</th>
-                    <th class="py-3 text-secondary small text-uppercase">Slug / URL</th>
-                    <th class="py-3 text-secondary small text-uppercase text-center">Post Count</th>
-                    <th class="pe-4 py-3 text-secondary small text-uppercase text-end">Actions</th>
+                    <th class="ps-4 py-3 text-secondary small text-uppercase">{{ __('Language') }}</th>
+                    <th class="py-3 text-secondary small text-uppercase">{{ __('Name') }}</th>
+                    <th class="py-3 text-secondary small text-uppercase">{{ __('Slug / URL') }}</th>
+                    <th class="py-3 text-secondary small text-uppercase text-center">{{ __('Post Count') }}</th>
+                    <th class="pe-4 py-3 text-secondary small text-uppercase text-end">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,13 +43,13 @@
                     <td class="pe-4 text-end">
                         <div class="d-flex justify-content-end gap-2">
                             <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-outline-dark border-0 bg-light rounded-3">
-                                Edit
+                                {{ __('Edit') }}
                             </a>
-                            <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" onsubmit="return confirm('Are you sure? All posts in this category may become uncategorized.')">
+                            <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure? All posts in this category may become uncategorized.') }}')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-outline-danger border-0 bg-light rounded-3">
-                                    Delete
+                                    {{ __('Delete') }}
                                 </button>
                             </form>
                         </div>

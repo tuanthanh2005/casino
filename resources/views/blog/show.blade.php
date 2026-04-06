@@ -17,7 +17,7 @@
 
                 <!-- Ad Slot: Top Banner (BANNER NGANG - SAU TIÊU ĐỀ) -->
                 <div class="ad-slot my-4 text-center" style="min-height: 90px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em;">
-                    Quảng cáo (Header Banner)
+                    {{ __('Advertisement') }}
                 </div>
 
                 <div class="d-flex align-items-center justify-content-center gap-3 py-4 border-top border-bottom"
@@ -29,8 +29,8 @@
                         <p class="mb-0 fw-bold small" style="color: var(--dark); line-height: 1.2;">
                             {{ $post->author->name ?? 'Admin' }}
                         </p>
-                        <p class="mb-0 small" style="color: #64748b; font-size: 0.75rem;">Last update:
-                            {{ $post->updated_at->format('F j, Y') }} • 8 min read
+                        <p class="mb-0 small" style="color: #64748b; font-size: 0.75rem;">{{ __('Last update') }}:
+                            {{ $post->updated_at->format('F j, Y') }} • 8 {{ __('min read') }}
                         </p>
                     </div>
                 </div>
@@ -45,19 +45,18 @@
 
             <div id="author-note" class="mb-5 p-4 rounded-4" style="background: #f8fafc; border: 1px solid var(--border);">
                 <p class="mb-0 small text-secondary" style="line-height: 1.7; font-weight: 500;">
-                    <strong class="text-dark">Editorial Note:</strong> Our passionate contributors spend weeks researching
-                    and testing aquarium equipment. Every guide represents our deep commitment to your success.
+                    <strong class="text-dark">{{ __('Editorial Note') }}:</strong> {{ __('Our passionate contributors spend weeks researching and testing aquarium equipment. Every guide represents our deep commitment to your success.') }}
                 </p>
             </div>
 
             <div id="toc" class="mb-5 p-4 rounded-4" style="background: white; border: 1px solid var(--border);">
-                <h4 class="h6 mb-3 text-dark fw-bold">Inside this guide:</h4>
+                <h4 class="h6 mb-3 text-dark fw-bold">{{ __('Inside this guide') }}:</h4>
                 <ul id="toc-list" class="list-unstyled mb-0 d-flex flex-row flex-wrap gap-x-4 gap-y-2 small"></ul>
             </div>
 
             <!-- Ad Slot: Middle (SQUARE/RECTANGLE - SAU MỤC LỤC) -->
             <div class="ad-slot mb-5 text-center" style="min-height: 250px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em;">
-                Quảng cáo (Sidebar/In-feed)
+                {{ __('Advertisement') }}
             </div>
 
             <div id="content-body" class="prose"
@@ -67,7 +66,7 @@
 
             @if(isset($post->faqs) && ($post->faqs->count() > 0))
                 <div class="mt-5 pt-5 border-top" style="border-top: 1px solid var(--border) !important;">
-                    <h2 class="h3 fw-black mb-4">Frequently Asked Questions</h2>
+                    <h2 class="h3 fw-black mb-4">{{ __('Frequently Asked Questions') }}</h2>
                     <div class="d-flex flex-column gap-3">
                         @foreach($post->faqs as $faq)
                             <div class="p-4 bg-light rounded-4 border" style="border-color: var(--border) !important;">
@@ -80,10 +79,10 @@
             @endif
 
             <div class="mt-5 p-5 text-center rounded-4" style="background: var(--dark); color: white;">
-                <h3 class="h4 mb-3 text-white">Join 15,000+ happy fishkeepers</h3>
-                <p class="small opacity-75 mb-4">Get the best tips to your inbox every week.</p>
+                <h3 class="h4 mb-3 text-white">{{ __('Join 15,000+ happy fishkeepers') }}</h3>
+                <p class="small opacity-75 mb-4">{{ __('Get the best tips to your inbox every week.') }}</p>
                 <a href="/newsletter" class="btn btn-primary"
-                    style="background: white; color: var(--dark); padding: 0.75rem 2rem;">Join Now</a>
+                    style="background: white; color: var(--dark); padding: 0.75rem 2rem;">{{ __('Join Now') }}</a>
             </div>
         </div>
     </div>
@@ -159,7 +158,7 @@
 
             /* Định dạng chung cho các vùng quảng cáo */
             .ad-slot::before {
-                content: "ADVERTISEMENT";
+                content: "{{ __('Advertisement') }}";
                 position: absolute;
                 top: -15px;
                 left: 50%;

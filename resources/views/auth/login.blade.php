@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - Aquahub.pro</title>
+    <title>{{ __('Login') }} - Aquahub.pro</title>
     <link rel="icon" type="image/png" href="{{ asset('av.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
@@ -23,8 +23,8 @@
                 <img src="{{ asset('av.png') }}" alt="" style="height: 36px; border-radius: 8px;">
                 <span>AQUAHUB</span>
             </a>
-            <h1 class="h4 mt-4 fw-bold mb-1">Welcome back</h1>
-            <p class="text-secondary small">Enter your credentials to access your account</p>
+            <h1 class="h4 mt-4 fw-bold mb-1">{{ __('Welcome back') }}</h1>
+            <p class="text-secondary small">{{ __('Enter your credentials to access your account') }}</p>
         </div>
 
         @if($errors->any())
@@ -36,25 +36,25 @@
         <form method="POST" action="{{ route('login') }}">
             @csrf
             <div class="mb-3">
-                <label class="form-label small fw-bold text-uppercase opacity-75">Email address</label>
+                <label class="form-label small fw-bold text-uppercase opacity-75">{{ __('Email address') }}</label>
                 <input type="email" name="email" class="form-control" placeholder="name@example.com" value="{{ old('email') }}" required autofocus style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.8125rem;">
             </div>
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center">
-                    <label class="form-label small fw-bold text-uppercase opacity-75">Password</label>
-                    <a href="#" class="small text-primary text-decoration-none fw-bold" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot?</a>
+                    <label class="form-label small fw-bold text-uppercase opacity-75">{{ __('Password') }}</label>
+                    <a href="#" class="small text-primary text-decoration-none fw-bold" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">{{ __('Forgot?') }}</a>
                 </div>
                 <input type="password" name="password" class="form-control" placeholder="••••••••" required style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.8125rem;">
             </div>
 
             <div class="mb-4 form-check">
                 <input type="checkbox" name="remember" class="form-check-input" id="remember">
-                <label class="form-check-label small opacity-75" for="remember">Stay logged in for 30 days</label>
+                <label class="form-check-label small opacity-75" for="remember">{{ __('Stay logged in for 30 days') }}</label>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 py-3 mb-4" style="border-radius: 12px; font-weight: 700;">Sign in to account</button>
+            <button type="submit" class="btn btn-primary w-100 py-3 mb-4" style="border-radius: 12px; font-weight: 700;">{{ __('Sign in to account') }}</button>
             
-            <p class="text-center small text-secondary mb-0">Don't have an account? <a href="{{ route('register') }}" class="text-primary text-decoration-none fw-bold">Sign up free</a></p>
+            <p class="text-center small text-secondary mb-0">{{ __("Don't have an account?") }} <a href="{{ route('register') }}" class="text-primary text-decoration-none fw-bold">{{ __('Sign up free') }}</a></p>
         </form>
     </div>
 
@@ -65,21 +65,21 @@
                 <div class="p-4 p-lg-5">
                     <div class="text-center mb-4">
                         <div style="width: 48px; height: 48px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">🔑</div>
-                        <h5 class="fw-bold h4">Forgot Password?</h5>
-                        <p class="text-secondary small">Provide your account details and our admin will reach out via chat or email to verify your identity and reset your password manually.</p>
+                        <h5 class="fw-bold h4">{{ __('Forgot Password?') }}</h5>
+                        <p class="text-secondary small">{{ __('Provide your account details and our admin will reach out via chat or email to verify your identity and reset your password manually.') }}</p>
                     </div>
 
                     <form action="{{ route('password.manual_reset') }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label class="form-label small fw-bold">Full Name</label>
+                            <label class="form-label small fw-bold">{{ __('Full Name') }}</label>
                             <input type="text" name="name" class="form-control" required placeholder="John Doe" style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px;">
                         </div>
                         <div class="mb-4">
-                            <label class="form-label small fw-bold">Account Email</label>
+                            <label class="form-label small fw-bold">{{ __('Account Email') }}</label>
                             <input type="email" name="email" class="form-control" required placeholder="youraccount@email.com" style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px;">
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 py-3" style="border-radius: 12px;">Request Manual Reset</button>
+                        <button type="submit" class="btn btn-primary w-100 py-3" style="border-radius: 12px;">{{ __('Request Manual Reset') }}</button>
                     </form>
                 </div>
             </div>

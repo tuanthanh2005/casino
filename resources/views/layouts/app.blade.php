@@ -55,8 +55,8 @@
                     @endphp
                     
                     <a class="d-flex align-items-center dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; padding: 5px;">
-                        @if($currentCountry && $currentCountry->icon)
-                            <img src="{{ asset('uploads/countries/' . $currentCountry->icon) }}" alt="{{ $currentCountry->name }}" style="width: 26px; height: 17px; object-fit: cover; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 2px solid white;">
+                        @if($currentCountry && isset($currentCountry->icon) && $currentCountry->icon)
+                            <img src="{{ asset('uploads/countries/' . $currentCountry->icon) }}" alt="{{ $currentCountry->name ?? '' }}" style="width: 26px; height: 17px; object-fit: cover; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 2px solid white;">
                         @else
                             <span class="small fw-bold text-dark border px-2 py-1 rounded bg-light">{{ strtoupper(app()->getLocale()) }}</span>
                         @endif
@@ -64,18 +64,18 @@
                     
                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2" style="border-radius: 15px; min-width: 170px; font-size: 0.85rem; z-index: 99999;">
                         <li class="px-3 py-2">
-                            <span class="text-secondary smaller text-uppercase fw-800 opacity-50" style="font-size: 0.65rem; letter-spacing: 0.1em;">Select Country</span>
+                            <span class="text-secondary smaller text-uppercase fw-800 opacity-50" style="font-size: 0.65rem; letter-spacing: 0.1em;">{{ __('Select Country') }}</span>
                         </li>
                         @foreach($active_countries ?? [] as $country)
                             <li>
-                                <a class="dropdown-item py-2 px-3 d-flex align-items-center justify-content-between {{ strtolower(app()->getLocale()) == strtolower($country->code) || ($country->code == 'VI' && app()->getLocale() == 'vi') || ($country->code == 'en' && app()->getLocale() == 'en') ? 'active' : '' }}" href="{{ route('lang.switch', $country->code) }}">
+                                <a class="dropdown-item py-2 px-3 d-flex align-items-center justify-content-between {{ (isset($country->code) && (strtolower(app()->getLocale()) == strtolower($country->code) || ($country->code == 'VI' && app()->getLocale() == 'vi') || ($country->code == 'en' && app()->getLocale() == 'en'))) ? 'active' : '' }}" href="{{ isset($country->code) ? route('lang.switch', $country->code) : '#' }}">
                                     <div class="d-flex align-items-center gap-2">
-                                        @if($country->icon)
+                                        @if(isset($country->icon) && $country->icon)
                                             <img src="{{ asset('uploads/countries/' . $country->icon) }}" style="width: 20px; height: 13px; object-fit: cover; border-radius: 2px;">
                                         @endif
-                                        <span class="fw-500">{{ $country->name }}</span>
+                                        <span class="fw-500">{{ $country->name ?? '' }}</span>
                                     </div>
-                                    @if(app()->getLocale() == $country->code)
+                                    @if(isset($country->code) && app()->getLocale() == $country->code)
                                         <div style="width: 6px; height: 6px; background: var(--primary); border-radius: 50%;"></div>
                                     @endif
                                 </a>
@@ -111,7 +111,7 @@
         <!-- Mobile Search Dropdown -->
         <div id="mobile-search-bar" class="d-md-none" style="display: none; position: absolute; top: 60px; left: 0; right: 0; background: white; padding: 12px 20px; border-bottom: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.05); z-index: 999;">
             <form action="{{ route('search') }}" method="GET">
-                <input type="text" name="q" class="form-control border-0 bg-light" placeholder="Search guides and tutorials..." 
+                <input type="text" name="q" class="form-control border-0 bg-light" placeholder="{{ __('Search guides and tutorials...') }}" 
                     style="border-radius: 12px; padding: 0.75rem 1.25rem; font-size: 0.9rem;" id="mobile-search-input">
             </form>
         </div>
@@ -138,8 +138,8 @@
         <div
             style="background: var(--dark); color: white; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h5 class="mb-0 h6">Chat with Admin</h5>
-                <p class="mb-0" style="font-size: 0.7rem; opacity: 0.7;">We usually reply in minutes</p>
+                <h5 class="mb-0 h6">{{ __('Chat with Admin') }}</h5>
+                <p class="mb-0" style="font-size: 0.7rem; opacity: 0.7;">{{ __('We usually reply in minutes') }}</p>
             </div>
             <button onclick="toggleChat()"
                 style="background: none; border: none; color: white; opacity: 0.5;">✕</button>
@@ -149,7 +149,7 @@
         </div>
         <div style="padding: 1rem; border-top: 1px solid var(--border);">
             <div style="display: flex; gap: 0.5rem;">
-                <input type="text" id="chat-input" placeholder="Type a message..."
+                <input type="text" id="chat-input" placeholder="{{ __('Type a message...') }}"
                     style="flex-grow: 1; border: 1px solid var(--border); padding: 0.6rem 1rem; border-radius: 12px; font-size: 0.8125rem;"
                     onkeypress="if(event.key === 'Enter') sendMessage()">
                 <button onclick="sendMessage()"
@@ -173,7 +173,7 @@
                         <span>AQUAHUB</span>
                     </a>
                     <p class="text-secondary small mb-4" style="line-height: 1.8; max-width: 320px;">
-                        {{ $footer_settings['footer_about'] ?? 'The elite aquarium resource dedicated to helping beginners build and maintain stunning, healthy underwater worlds.' }}
+                        {{ $footer_settings['footer_about'] ?? __('The elite aquarium resource dedicated to helping beginners build and maintain stunning, healthy underwater worlds.') }}
                     </p>
                     <div class="d-flex gap-3 mb-4">
                         @if(isset($footer_settings['social_facebook']))
@@ -205,14 +205,14 @@
                     </div>
                 </div>
                 <div class="col-6 col-lg-2">
-                    <h5 class="fw-bold small text-uppercase mb-4">Explore</h5>
+                    <h5 class="fw-bold small text-uppercase mb-4">{{ __('Explore') }}</h5>
                     <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
-                        <li><a href="/" class="text-secondary text-decoration-none small">Home Resource</a></li>
-                        <li><a href="/blog" class="text-secondary text-decoration-none small">Latest Guides</a></li>
+                        <li><a href="/" class="text-secondary text-decoration-none small">{{ __('Home Resource') }}</a></li>
+                        <li><a href="/blog" class="text-secondary text-decoration-none small">{{ __('Latest Guides') }}</a></li>
                     </ul>
                 </div>
                 <div class="col-6 col-lg-3">
-                    <h5 class="fw-bold small text-uppercase mb-4">Categories</h5>
+                    <h5 class="fw-bold small text-uppercase mb-4">{{ __('Categories') }}</h5>
                     <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
                         @if(isset($footer_categories))
                             @foreach($footer_categories as $cat)
@@ -226,7 +226,7 @@
                     </ul>
                 </div>
                 <div class="col-lg-3">
-                    <h5 class="fw-bold small text-uppercase mb-4">Global Access</h5>
+                    <h5 class="fw-bold small text-uppercase mb-4">{{ __('Global Access') }}</h5>
                     <div class="d-flex flex-wrap gap-2 mb-4">
                         @if(isset($footer_settings['footer_regions']))
                             @foreach(explode(',', $footer_settings['footer_regions']) as $region)
@@ -240,7 +240,7 @@
             <div
                 class="mt-5 pt-4 border-top text-center d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                 <p class="mb-0 text-secondary extra-small fw-bold">
-                    {{ $footer_settings['footer_copyright'] ?? '© 2026 AQUAHUB PRO. ALL RIGHTS RESERVED.' }}
+                    {{ $footer_settings['footer_copyright'] ?? '© 2026 AQUAHUB PRO. ' . __('All Rights Reserved') . '.' }}
                 </p>
                 <div class="d-flex gap-4">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg"
@@ -260,24 +260,24 @@
         </a>
         <a href="/category/beginners" class="mobile-nav-item {{ request()->is('category/beginners') ? 'active' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-            <span>Beginners</span>
+            <span>{{ __('Beginners') }}</span>
         </a>
         <a href="/category/setup-guides" class="mobile-nav-item {{ request()->is('category/setup-guides') ? 'active' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-            <span>Guides</span>
+            <span>{{ __('Guides') }}</span>
         </a>
         <a href="/category/product-reviews" class="mobile-nav-item {{ request()->is('category/product-reviews') ? 'active' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span>Reviews</span>
+            <span>{{ __('Reviews') }}</span>
         </a>
         <a href="{{ auth()->check() ? route('profile') : route('login') }}" class="mobile-nav-item {{ request()->is('profile') || request()->is('login') ? 'active' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Account</span>
+            <span>{{ auth()->check() ? __('Profile') : __('Login') }}</span>
         </a>
         @if(auth()->check() && auth()->user()->is_admin)
             <a href="/admin" class="mobile-nav-item text-danger">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <span>Admin</span>
+                <span>{{ __('Admin') }}</span>
             </a>
         @endif
     </div>

@@ -6,12 +6,12 @@
 <div class="row g-4">
     <div class="col-lg-4">
         <div class="card p-4 border-0 shadow-sm">
-            <h5 class="fw-bold mb-4">Conversations</h5>
+            <h5 class="fw-bold mb-4">{{ __('Conversations') }}</h5>
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 @foreach($conversations as $convo)
                 <div class="p-3 border rounded-4 cursor-pointer hover-bg-light transition-all" onclick="openConvo('{{ $convo->user_id ?: $convo->session_id }}', '{{ $convo->guest_name ?: ($convo->user->name ?? 'Guest User') }}')" style="border-color: rgba(15, 23, 42, 0.05) !important;">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="fw-bold small">{{ $convo->user ? $convo->user->name : ($convo->guest_name ? 'Khách: ' . $convo->guest_name : 'Khách: Ẩn danh') }}</span>
+                        <span class="fw-bold small">{{ $convo->user ? $convo->user->name : ($convo->guest_name ? __('Khách') . ': ' . $convo->guest_name : __('Khách') . ': ' . __('Ẩn danh')) }}</span>
                         <span class="text-secondary" style="font-size: 0.65rem;">{{ $convo->created_at->diffForHumans() }}</span>
                     </div>
                 </div>
@@ -23,8 +23,8 @@
     <div class="col-lg-8">
         <div id="chat-box" class="card border-0 shadow-sm flex-column overflow-hidden" style="display: none; height: 600px;">
             <div class="p-4 border-bottom d-flex justify-content-between align-items-center" style="background: var(--dark); color: white;">
-                <h5 id="convo-name" class="fw-bold mb-0 h6">Select a conversation</h5>
-                <span class="badge bg-success small">Online</span>
+                <h5 id="convo-name" class="fw-bold mb-0 h6">{{ __('Select a conversation') }}</h5>
+                <span class="badge bg-success small">{{ __('Online') }}</span>
             </div>
             
             <div id="convo-messages" class="card-body p-4 overflow-y-auto" style="background: #f8fafc; flex-grow: 1; display: flex; flex-direction: column; gap: 1rem;">
@@ -33,15 +33,15 @@
 
             <div class="p-4 border-top">
                 <div class="d-flex gap-2">
-                    <input type="text" id="admin-input" class="form-control border-0 bg-light" placeholder="Type your response..." style="padding: 0.75rem 1.25rem; border-radius: 99px; font-size: 0.8125rem;">
-                    <button onclick="sendAdminReply()" class="btn btn-primary" style="border-radius: 99px;">Send</button>
+                    <input type="text" id="admin-input" class="form-control border-0 bg-light" placeholder="{{ __('Type your response...') }}" style="padding: 0.75rem 1.25rem; border-radius: 99px; font-size: 0.8125rem;">
+                    <button onclick="sendAdminReply()" class="btn btn-primary" style="border-radius: 99px;">{{ __('Send') }}</button>
                 </div>
             </div>
         </div>
 
         <div id="empty-chat" class="h-100 d-flex flex-column align-items-center justify-content-center opacity-50 p-5">
             <div style="width: 64px; height: 64px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">💬</div>
-            <p class="small text-secondary fw-bold">Select a conversation from the left to start chatting.</p>
+            <p class="small text-secondary fw-bold">{{ __('Select a conversation from the left to start chatting.') }}</p>
         </div>
     </div>
 </div>
