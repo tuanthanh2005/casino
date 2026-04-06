@@ -51,7 +51,7 @@ class PostController extends Controller
         if ($request->hasFile('featured_image')) {
             $image = $request->file('featured_image');
             $fileName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('uploads/posts'), $fileName);
+            Storage::disk('public_uploads')->putFileAs('uploads/posts', $image, $fileName);
             $validated['featured_image'] = $fileName;
         }
 
@@ -95,12 +95,12 @@ class PostController extends Controller
         ]);
 
         if ($request->hasFile('featured_image')) {
-            if ($post->featured_image && file_exists(public_path('uploads/posts/' . $post->featured_image))) {
-                unlink(public_path('uploads/posts/' . $post->featured_image));
+            if ($post->featured_image && Storage::disk('public_uploads')->exists('uploads/posts/' . $post->featured_image)) {
+                Storage::disk('public_uploads')->delete('uploads/posts/' . $post->featured_image);
             }
             $image = $request->file('featured_image');
             $fileName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('uploads/posts'), $fileName);
+            Storage::disk('public_uploads')->putFileAs('uploads/posts', $image, $fileName);
             $validated['featured_image'] = $fileName;
         }
 
@@ -121,8 +121,8 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
-        if ($post->featured_image && file_exists(public_path('uploads/posts/' . $post->featured_image))) {
-            unlink(public_path('uploads/posts/' . $post->featured_image));
+        if ($post->featured_image && Storage::disk('public_uploads')->exists('uploads/posts/' . $post->featured_image)) {
+            Storage::disk('public_uploads')->delete('uploads/posts/' . $post->featured_image);
         }
         $post->delete();
         return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully.');

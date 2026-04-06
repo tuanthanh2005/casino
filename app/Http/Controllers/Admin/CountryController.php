@@ -32,8 +32,7 @@ class CountryController extends Controller
         if ($request->hasFile('icon')) {
             $image = $request->file('icon');
             $name = time().'.'.$image->getClientOriginalExtension();
-            $destinationPath = public_path('/uploads/countries');
-            $image->move($destinationPath, $name);
+            Storage::disk('public_uploads')->putFileAs('uploads/countries', $image, $name);
             $validated['icon'] = $name;
         }
 
@@ -58,14 +57,13 @@ class CountryController extends Controller
 
         if ($request->hasFile('icon')) {
             // Delete old icon
-            if ($country->icon && file_exists(public_path('/uploads/countries/' . $country->icon))) {
-                unlink(public_path('/uploads/countries/' . $country->icon));
+            if ($country->icon && Storage::disk('public_uploads')->exists('uploads/countries/' . $country->icon)) {
+                Storage::disk('public_uploads')->delete('uploads/countries/' . $country->icon);
             }
 
             $image = $request->file('icon');
             $name = time().'.'.$image->getClientOriginalExtension();
-            $destinationPath = public_path('/uploads/countries');
-            $image->move($destinationPath, $name);
+            Storage::disk('public_uploads')->putFileAs('uploads/countries', $image, $name);
             $validated['icon'] = $name;
         }
 
@@ -76,8 +74,8 @@ class CountryController extends Controller
 
     public function destroy(Country $country)
     {
-        if ($country->icon && file_exists(public_path('/uploads/countries/' . $country->icon))) {
-            unlink(public_path('/uploads/countries/' . $country->icon));
+        if ($country->icon && Storage::disk('public_uploads')->exists('uploads/countries/' . $country->icon)) {
+            Storage::disk('public_uploads')->delete('uploads/countries/' . $country->icon);
         }
         $country->delete();
         return redirect()->route('admin.countries.index')->with('success', 'Country deleted successfully.');

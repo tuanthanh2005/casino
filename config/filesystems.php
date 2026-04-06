@@ -50,7 +50,6 @@ return [
         'public_uploads' => [
             'driver' => 'local',
             'root' => base_path('../public_html'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/'),
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
