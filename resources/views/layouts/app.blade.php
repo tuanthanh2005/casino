@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
     <title>@yield('title', 'Aquahub.pro — The Modern Aquarium Resource')</title>
     <meta name="description"
         content="@yield('meta_description', 'Elite guides, setup tutorials, and species care for aquarium owners worldwide.')">
