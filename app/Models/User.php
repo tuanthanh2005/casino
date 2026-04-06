@@ -41,7 +41,9 @@ class User extends Authenticatable
             return true;
         }
 
-        return $this->role === 'admin' || (bool) $this->getAttribute('is_admin');
+        // 2. Fallback to database 'role' column (safely)
+        // Note: Do not access $this->is_admin here as it causes recursion with the accessor
+        return ($this->role ?? '') === 'admin';
     }
 
     /**
