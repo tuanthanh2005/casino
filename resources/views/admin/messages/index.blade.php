@@ -2,7 +2,7 @@
 
 @section('page_title', 'Support Messages')
 
-@section('content')
+@section('admin_content')
 <div class="row g-4">
     <div class="col-lg-4">
         <div class="card p-4 border-0 shadow-sm">
@@ -11,7 +11,7 @@
                 @foreach($conversations as $convo)
                 <div class="p-3 border rounded-4 cursor-pointer hover-bg-light transition-all" onclick="openConvo('{{ $convo->user_id ?: $convo->session_id }}', '{{ $convo->guest_name ?: ($convo->user->name ?? 'Guest User') }}')" style="border-color: rgba(15, 23, 42, 0.05) !important;">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="fw-bold small">{{ $convo->guest_name ?: ($convo->user->name ?? 'Guest') }}</span>
+                        <span class="fw-bold small">{{ $convo->user ? $convo->user->name : ($convo->guest_name ? 'Khách: ' . $convo->guest_name : 'Khách: Ẩn danh') }}</span>
                         <span class="text-secondary" style="font-size: 0.65rem;">{{ $convo->created_at->diffForHumans() }}</span>
                     </div>
                 </div>

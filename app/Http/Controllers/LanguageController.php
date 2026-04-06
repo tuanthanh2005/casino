@@ -9,8 +9,13 @@ class LanguageController extends Controller
 {
     public function switch($locale)
     {
-        if (in_array($locale, ['en', 'vi'])) {
-            Session::put('locale', $locale);
+        $locale = strtolower($locale);
+        $availableLocales = ['en', 'vi', 'vn', 'us', 'uk'];
+        
+        if (in_array($locale, $availableLocales)) {
+            $effectiveLocale = in_array($locale, ['vi', 'vn']) ? 'vi' : 'en';
+            \Illuminate\Support\Facades\Session::put('locale', $effectiveLocale);
+            app()->setLocale($effectiveLocale);
         }
         return redirect()->back();
     }

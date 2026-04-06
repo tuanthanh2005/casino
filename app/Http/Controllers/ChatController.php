@@ -43,14 +43,26 @@ class ChatController extends Controller
         ->orderBy('created_at', 'asc')
         ->get();
 
+        // Mark as read
+        Message::where('is_from_admin', true)
+            ->where('is_read', false)
+            ->where(function($q) use ($sessionId) {
+                $q->where('session_id', $sessionId);
+                if (\Illuminate\Support\Facades\Auth::check()) {
+                    $q->orWhere('user_id', \Illuminate\Support\Facades\Auth::id());
+                }
+            })
+            ->update(['is_read' => true]);
+
         return response()->json(['messages' => $messages]);
     }
 
     public function adminIndex()
     {
+        // Get unique conversations based on user_id (if exists) or session_id (for guests)
         $conversations = Message::where('is_from_admin', false)
             ->where('type', 'chat')
-            ->latest()
+            ->orderBy('created_at', 'desc')
             ->get()
             ->unique(function ($item) {
                 return $item->user_id ?: $item->session_id;
@@ -62,12 +74,25 @@ class ChatController extends Controller
     public function getConversation($id)
     {
         $messages = Message::where(function($query) use ($id) {
-            $query->where('user_id', $id)->orWhere('session_id', $id);
-        })
-        ->orderBy('created_at', 'asc')
-        ->get();
+                if (is_numeric($id)) {
+                    $query->where('user_id', $id);
+                } else {
+                    $query->where('session_id', $id);
+                }
+            })
+            ->orderBy('created_at', 'asc')
+            ->get();
 
-        Message::where('session_id', $id)->orWhere('user_id', $id)->update(['is_read' => true]);
+        // Mark as read
+        Message::where(function($query) use ($id) {
+                if (is_numeric($id)) {
+                    $query->where('user_id', $id);
+                } else {
+                    $query->where('session_id', $id);
+                }
+            })
+            ->where('is_from_admin', false)
+            ->update(['is_read' => true]);
 
         return response()->json(['messages' => $messages]);
     }
@@ -90,5 +115,19 @@ class ChatController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+    }
+    public function getUnreadCount()
+    {
+        $sessionId = session()->getId();
+        $count = Message::where('is_from_admin', true)
+            ->where('is_read', false)
+            ->where(function($query) use ($sessionId) {
+                $query->where('session_id', $sessionId);
+                if (\Illuminate\Support\Facades\Auth::check()) {
+                    $query->orWhere('user_id', \Illuminate\Support\Facades\Auth::id());
+                }
+            })->count();
+
+        return response()->json(['count' => $count]);
     }
 }

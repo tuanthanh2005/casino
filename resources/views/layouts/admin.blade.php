@@ -98,7 +98,14 @@
         <nav>
             <a href="/admin" class="nav-item-admin {{ request()->is('admin') ? 'active' : '' }}">Dashboard</a>
             <a href="{{ route('admin.posts.index') }}" class="nav-item-admin {{ request()->is('admin/posts*') ? 'active' : '' }}">All Posts</a>
-            <a href="{{ route('admin.messages.index') }}" class="nav-item-admin {{ request()->is('admin/messages*') ? 'active' : '' }}">Support Messages</a>
+            <a href="{{ route('admin.messages.index') }}" class="nav-item-admin {{ request()->is('admin/messages*') ? 'active' : '' }} d-flex justify-content-between align-items-center">
+                <span>Support Messages</span>
+                @if(($unread_admin_messages ?? 0) > 0)
+                    <span class="badge bg-danger rounded-pill" style="font-size: 0.65rem;">{{ $unread_admin_messages }}</span>
+                @endif
+            </a>
+            <a href="{{ route('admin.settings.footer') }}" class="nav-item-admin {{ request()->is('admin/settings/footer*') ? 'active' : '' }}">Footer Settings</a>
+            <a href="{{ route('admin.countries.index') }}" class="nav-item-admin {{ request()->is('admin/countries*') ? 'active' : '' }}">Countries Management</a>
             <a href="/admin/categories" class="nav-item-admin {{ request()->is('admin/categories*') ? 'active' : '' }}">Categories</a>
             <a href="/admin/tags" class="nav-item-admin {{ request()->is('admin/tags*') ? 'active' : '' }}">Tags</a>
             <div style="margin: 2rem 1rem 1rem; font-size: 0.75rem; text-transform: uppercase; color: #475569; letter-spacing: 0.1em;">External</div>

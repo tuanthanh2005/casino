@@ -19,6 +19,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // For User frontend
+        \Illuminate\Support\Facades\View::composer('layouts.app', \App\View\Composers\FooterComposer::class);
+
+        // For Admin sidebar
+        \Illuminate\Support\Facades\View::composer('layouts.admin', function ($view) {
+            $count = \App\Models\Message::where('is_from_admin', false)->where('is_read', false)->count();
+            $view->with('unread_admin_messages', $count);
+        });
     }
 }

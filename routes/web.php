@@ -61,7 +61,10 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 |--------------------------------------------------------------------------
 */
 Route::get('chat/messages', [ChatController::class, 'getMessages'])->name('chat.get');
+Route::get('chat/unread-count', [ChatController::class, 'getUnreadCount'])->name('chat.unread');
 Route::post('chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+Route::get('profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile')->middleware('auth');
+Route::post('profile', [App\Http\Controllers\ProfileController::class, 'update'])->middleware('auth');
 
 /*
 |--------------------------------------------------------------------------
@@ -74,10 +77,17 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('categories', AdminCategoryController::class);
     Route::resource('tags', AdminTagController::class);
 
+    // Country Management (Flags/Icons)
+    Route::resource('countries', \App\Http\Controllers\Admin\CountryController::class);
+
     // Admin Chat & Support
     Route::get('/messages', [ChatController::class, 'adminIndex'])->name('messages.index');
     Route::get('/messages/{id}', [ChatController::class, 'getConversation'])->name('messages.show');
     Route::post('/messages/send', [ChatController::class, 'adminSend'])->name('messages.send');
+
+    // Site Settings (Footer)
+    Route::get('/settings/footer', [\App\Http\Controllers\Admin\SettingController::class, 'footer'])->name('settings.footer');
+    Route::post('/settings/footer', [\App\Http\Controllers\Admin\SettingController::class, 'updateFooter']);
 });
 
 /*

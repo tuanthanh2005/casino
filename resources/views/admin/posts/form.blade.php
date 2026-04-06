@@ -118,4 +118,55 @@
         </div>
     </div>
 </form>
+
+@push('styles')
+<style>
+    .ck-editor__editable_inline {
+        min-height: 400px;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 1rem !important;
+        line-height: 1.6 !important;
+    }
+    .ck.ck-editor__main>.ck-editor__editable {
+        background: #fff !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .ck.ck-toolbar {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px 8px 0 0 !important;
+    }
+    .ck.ck-content {
+        border: 1px solid #e2e8f0 !important;
+        border-top: none !important;
+        border-radius: 0 0 8px 8px !important;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#editor'), {
+            toolbar: [
+                'heading', '|', 
+                'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
+                'insertTable', 'mediaEmbed', 'undo', 'redo'
+            ],
+            heading: {
+                options: [
+                    { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                    { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                    { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                    { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+                ]
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+@endpush
 @endsection

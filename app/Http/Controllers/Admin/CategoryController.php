@@ -23,6 +23,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'lang' => 'required|in:en,vi',
             'name' => 'required|max:255',
             'slug' => 'nullable|unique:categories,slug',
             'description' => 'nullable',
@@ -47,6 +48,7 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $validated = $request->validate([
+            'lang' => 'required|in:en,vi',
             'name' => 'required|max:255',
             'slug' => "required|unique:categories,slug,{$category->id}",
             'description' => 'nullable',

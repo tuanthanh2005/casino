@@ -90,6 +90,27 @@ body {
     color: var(--dark);
 }
 
+.lang-switcher {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.lang-switcher a {
+    color: #94a3b8;
+    transition: all 0.2s ease;
+}
+
+.lang-switcher a:hover, .lang-switcher a.active {
+    color: var(--dark);
+}
+
+.lang-switcher .separator {
+    width: 1px;
+    height: 12px;
+    background: rgba(0,0,0,0.1);
+}
+
 /* Aesthetic Hero */
 .hero {
     padding: 120px 0 80px;
