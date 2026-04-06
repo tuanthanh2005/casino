@@ -14,6 +14,7 @@ class Category extends Model
         'name',
         'slug',
         'lang',
+        'ref_key',
         'description',
         'meta_title',
         'meta_description',

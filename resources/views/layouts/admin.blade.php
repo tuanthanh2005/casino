@@ -106,7 +106,7 @@
             </a>
             <a href="{{ route('admin.settings.footer') }}" class="nav-item-admin {{ request()->is('admin/settings/footer*') ? 'active' : '' }}">{{ __('Footer Settings') }}</a>
             <a href="{{ route('admin.countries.index') }}" class="nav-item-admin {{ request()->is('admin/countries*') ? 'active' : '' }}">{{ __('Countries Management') }}</a>
-            <a href="/admin/categories" class="nav-item-admin {{ request()->is('admin/categories*') ? 'active' : '' }}">{{ __('Categories') }}</a>
+            <a href="/admin/categories" class="nav-item-admin {{ request()->is('admin/categories*') ? 'active' : '' }}">{{ __('Category Management') }}</a>
             <a href="/admin/tags" class="nav-item-admin {{ request()->is('admin/tags*') ? 'active' : '' }}">{{ __('Tags') }}</a>
             <div style="margin: 2rem 1rem 1rem; font-size: 0.75rem; text-transform: uppercase; color: #475569; letter-spacing: 0.1em;">{{ __('External') }}</div>
             <a href="/" target="_blank" class="nav-item-admin">{{ __('Visit Website') }}</a>
