@@ -23,7 +23,8 @@
         <table class="table" style="margin-top: 0;">
             <thead>
                 <tr>
-                    <th style="padding-left: 2rem;">Title</th>
+                    <th style="padding-left: 2rem;">Lang</th>
+                    <th>Title</th>
                     <th>Category</th>
                     <th>Status</th>
                     <th>Author</th>
@@ -35,13 +36,18 @@
                 @foreach($posts as $post)
                 <tr>
                     <td style="padding-left: 2rem;">
+                        <span class="badge {{ $post->lang == 'en' ? 'bg-primary' : 'bg-danger' }}" style="font-size: 0.65rem;">
+                            {{ strtoupper($post->lang) }}
+                        </span>
+                    </td>
+                    <td>
                         <span style="font-weight: 700; color: #0284c7; display: block; margin-bottom: 0.25rem;">{{ $post->title }}</span>
                         <span style="font-size: 0.75rem; color: #94a3b8;">/{{ $post->slug }}</span>
                     </td>
                     <td><span style="font-size: 0.8125rem; background: #f1f5f9; padding: 0.25rem 0.625rem; border-radius: 4px; font-weight: 500;">{{ $post->category->name }}</span></td>
                     <td>
-                        <span class="badge {{ $post->status === 'published' ? 'badge-published' : 'badge-draft' }}">
-                            {{ ucfirst($post->status) }}
+                        <span class="badge {{ $post->status === 'published' ? 'bg-success' : 'bg-secondary' }}" style="font-size: 0.65rem; text-transform: uppercase;">
+                            {{ $post->status }}
                         </span>
                     </td>
                     <td><span style="font-size: 0.8125rem;">{{ $post->author->name }}</span></td>
