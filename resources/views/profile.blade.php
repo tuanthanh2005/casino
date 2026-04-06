@@ -93,11 +93,11 @@
                         </div>
                     </div>
 
-                    <!-- Sign Out Mobile Prominent -->
-                    <div class="col-12 d-md-none">
+                    <!-- Sign Out Button -->
+                    <div class="col-12">
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-outline-danger w-100 py-3 borded-2" style="border-radius: 16px; font-weight: 700; border-width: 2px;">LOGOUT ACCOUNT</button>
+                            <button type="submit" class="btn btn-outline-danger w-100 py-3 mt-2" style="border-radius: 16px; font-weight: 700; border-width: 2px;">{{ __('Log Out') }}</button>
                         </form>
                     </div>
                 </div>
