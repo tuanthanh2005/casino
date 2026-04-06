@@ -37,20 +37,20 @@
             @csrf
             <div class="mb-3">
                 <label class="form-label small fw-bold">{{ __('Your full name') }}</label>
-                <input type="text" name="name" class="form-control" placeholder="John Doe" value="{{ old('name') }}" required autofocus style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.8125rem;">
+                <input type="text" name="name" class="form-control" placeholder="John Doe" value="{{ old('name') }}" required autofocus style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 1rem;">
             </div>
             <div class="mb-3">
                 <label class="form-label small fw-bold">{{ __('Email address') }}</label>
-                <input type="email" name="email" class="form-control" placeholder="name@example.com" value="{{ old('email') }}" required style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.8125rem;">
+                <input type="email" name="email" class="form-control" placeholder="name@example.com" value="{{ old('email') }}" required style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 1rem;">
             </div>
             <div class="row mb-4">
                 <div class="col-md-6">
                     <label class="form-label small fw-bold">{{ __('Password') }}</label>
-                    <input type="password" name="password" class="form-control" placeholder="••••••••" required style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.8125rem;">
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 1rem;">
                 </div>
                 <div class="col-md-6 mt-3 mt-md-0">
                     <label class="form-label small fw-bold">{{ __('Confirm Password') }}</label>
-                    <input type="password" name="password_confirmation" class="form-control" placeholder="••••••••" required style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.8125rem;">
+                    <input type="password" name="password_confirmation" class="form-control" placeholder="••••••••" required style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 1rem;">
                 </div>
             </div>
 

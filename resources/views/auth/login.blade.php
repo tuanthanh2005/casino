@@ -37,14 +37,14 @@
             @csrf
             <div class="mb-3">
                 <label class="form-label small fw-bold text-uppercase opacity-75">{{ __('Email address') }}</label>
-                <input type="email" name="email" class="form-control" placeholder="name@example.com" value="{{ old('email') }}" required autofocus style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.8125rem;">
+                <input type="email" name="email" class="form-control" placeholder="name@example.com" value="{{ old('email') }}" required autofocus style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 1rem;">
             </div>
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <label class="form-label small fw-bold text-uppercase opacity-75">{{ __('Password') }}</label>
                     <a href="#" class="small text-primary text-decoration-none fw-bold" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">{{ __('Forgot?') }}</a>
                 </div>
-                <input type="password" name="password" class="form-control" placeholder="••••••••" required style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.8125rem;">
+                <input type="password" name="password" class="form-control" placeholder="••••••••" required style="background: #f1f5f9; border: none; padding: 0.75rem 1rem; border-radius: 12px; font-size: 1rem;">
             </div>
 
             <div class="mb-4 form-check">
