@@ -7,7 +7,7 @@
     <div class="container" style="max-width: 800px; text-align: center;">
         <h1 style="font-size: 2.5rem; margin-bottom: 2rem;">{{ __('Search Results') }}</h1>
         <form action="/search" method="GET" style="display: flex; gap: 1rem; max-width: 600px; margin: 0 auto;">
-            <input type="text" name="q" value="{{ $query }}" placeholder="{{ __('Search our aquarium guides...') }}" style="flex-grow: 1; padding: 1rem 1.5rem; border: 1px solid #cbd5e1; border-radius: 9999px; font-size: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);">
+            <input type="text" name="q" value="{{ $query }}" placeholder="{{ __('Search our aquarium guides...') }}" style="flex-grow: 1; padding: 1rem 1.5rem; border: 1px solid #cbd5e1; border-radius: 9999px; font-size: 16px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);">
             <button type="submit" class="btn btn-primary" style="padding: 0 2rem; border-radius: 9999px;">{{ __('Search') }}</button>
         </form>
         @if($query)

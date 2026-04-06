@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>@yield('title', 'Aquahub.pro — The Modern Aquarium Resource')</title>
     <meta name="description"
         content="@yield('meta_description', 'Elite guides, setup tutorials, and species care for aquarium owners worldwide.')">
@@ -112,7 +112,7 @@
         <div id="mobile-search-bar" class="d-md-none" style="display: none; position: absolute; top: 60px; left: 0; right: 0; background: white; padding: 12px 20px; border-bottom: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.05); z-index: 999;">
             <form action="{{ route('search') }}" method="GET">
                 <input type="text" name="q" class="form-control border-0 bg-light" placeholder="{{ __('Search guides and tutorials...') }}" 
-                    style="border-radius: 12px; padding: 0.75rem 1.25rem; font-size: 1rem;" id="mobile-search-input">
+                    style="border-radius: 12px; padding: 0.75rem 1.25rem; font-size: 16px;" id="mobile-search-input">
             </form>
         </div>
     </header>
@@ -150,7 +150,7 @@
         <div style="padding: 1rem; border-top: 1px solid var(--border);">
             <div style="display: flex; gap: 0.5rem;">
                 <input type="text" id="chat-input" placeholder="{{ __('Type a message...') }}"
-                    style="flex-grow: 1; border: 1px solid var(--border); padding: 0.6rem 1rem; border-radius: 12px; font-size: 1rem;"
+                    style="flex-grow: 1; border: 1px solid var(--border); padding: 0.6rem 1rem; border-radius: 12px; font-size: 16px;"
                     onkeypress="if(event.key === 'Enter') sendMessage()">
                 <button onclick="sendMessage()"
                     style="background: var(--dark); border: none; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
