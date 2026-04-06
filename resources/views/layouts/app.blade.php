@@ -32,9 +32,9 @@
             </a>
             <nav class="nav-links">
                 <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">{{ __('Home') }}</a>
-                <a href="/category/beginners">{{ __('Beginners') }}</a>
-                <a href="/category/setup-guides">{{ __('Setup Guides') }}</a>
-                <a href="/category/product-reviews">{{ __('Reviews') }}</a>
+                <a href="/category/{{ app()->getLocale() == 'vi' ? 'cho-nguoi-moi' : 'beginners' }}">{{ __('Beginners') }}</a>
+                <a href="/category/{{ app()->getLocale() == 'vi' ? 'huong-dan-lap-dat' : 'setup-guides' }}">{{ __('Setup Guides') }}</a>
+                <a href="/category/{{ app()->getLocale() == 'vi' ? 'danh-gia-san-pham' : 'product-reviews' }}">{{ __('Reviews') }}</a>
                 @if(auth()->check() && auth()->user()->is_admin)
                     <a href="/admin" class="text-danger fw-bold">{{ __('Admin') }}</a>
                 @endif
@@ -258,15 +258,15 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             <span>{{ __('Home') }}</span>
         </a>
-        <a href="/category/beginners" class="mobile-nav-item {{ request()->is('category/beginners') ? 'active' : '' }}">
+        <a href="/category/{{ app()->getLocale() == 'vi' ? 'cho-nguoi-moi' : 'beginners' }}" class="mobile-nav-item {{ request()->is('category/beginners') || request()->is('category/cho-nguoi-moi') ? 'active' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
             <span>{{ __('Beginners') }}</span>
         </a>
-        <a href="/category/setup-guides" class="mobile-nav-item {{ request()->is('category/setup-guides') ? 'active' : '' }}">
+        <a href="/category/{{ app()->getLocale() == 'vi' ? 'huong-dan-lap-dat' : 'setup-guides' }}" class="mobile-nav-item {{ request()->is('category/setup-guides') || request()->is('category/huong-dan-lap-dat') ? 'active' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
             <span>{{ __('Guides') }}</span>
         </a>
-        <a href="/category/product-reviews" class="mobile-nav-item {{ request()->is('category/product-reviews') ? 'active' : '' }}">
+        <a href="/category/{{ app()->getLocale() == 'vi' ? 'danh-gia-san-pham' : 'product-reviews' }}" class="mobile-nav-item {{ request()->is('category/product-reviews') || request()->is('category/danh-gia-san-pham') ? 'active' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             <span>{{ __('Reviews') }}</span>
         </a>

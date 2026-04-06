@@ -34,7 +34,8 @@ if ($categories->isEmpty()) {
     $categories = Category::withCount('posts')->take(4)->get();
 }
 
-        $review_category = Category::where('slug', 'product-reviews')->where('lang', app()->getLocale())->first();
+        $review_slug = app()->getLocale() == 'vi' ? 'danh-gia-san-pham' : 'product-reviews';
+        $review_category = Category::where('slug', $review_slug)->where('lang', app()->getLocale())->first();
         $reviews = $review_category ? 
             Post::where('category_id', $review_category->id)
                 ->where('status', 'published')

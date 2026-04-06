@@ -8,8 +8,8 @@
         <h1 class="mx-auto" style="max-width: 900px; line-height: 1.05;">{{ __('Dive Into Your First Successful Aquarium') }}</h1>
         <p class="mx-auto">{{ __('Step-by-step guides, fish care tutorials, and setup advice to help you build a stunning underwater world without the stress.') }}</p>
         <div class="d-flex gap-3 justify-content-center">
-            <a href="/category/beginners" class="btn btn-primary px-4 py-2">{{ __('Explore All Guides') }}</a>
-            <a href="/category/product-reviews" class="btn btn-secondary px-4 py-2">{{ __('Compare Best Products') }}</a>
+            <a href="/category/{{ app()->getLocale() == 'vi' ? 'cho-nguoi-moi' : 'beginners' }}" class="btn btn-primary px-4 py-2">{{ __('Explore All Guides') }}</a>
+            <a href="/category/{{ app()->getLocale() == 'vi' ? 'danh-gia-san-pham' : 'product-reviews' }}" class="btn btn-secondary px-4 py-2">{{ __('Compare Best Products') }}</a>
         </div>
     </div>
 </div>
