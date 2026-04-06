@@ -41,8 +41,7 @@ class User extends Authenticatable
             return true;
         }
 
-        // 2. Fallback to database 'role' or 'is_admin' column
-        return (isset($this->role) && $this->role === 'admin') || (isset($this->is_admin) && $this->is_admin);
+        return $this->role === 'admin' || (bool) $this->getAttribute('is_admin');
     }
 
     /**
