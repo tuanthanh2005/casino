@@ -35,6 +35,9 @@
                 <a href="/category/beginners">{{ __('Beginners') }}</a>
                 <a href="/category/setup-guides">{{ __('Setup Guides') }}</a>
                 <a href="/category/product-reviews">{{ __('Reviews') }}</a>
+                @if(auth()->check() && auth()->user()->is_admin)
+                    <a href="/admin" class="text-danger fw-bold">{{ __('Admin') }}</a>
+                @endif
                 <a href="{{ auth()->check() ? route('profile') : route('login') }}" class="{{ request()->is('profile') || request()->is('login') ? 'active' : '' }}">
                     {{ auth()->check() ? __('Account') : __('Login') }}
                 </a>
@@ -271,6 +274,12 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <span>Account</span>
         </a>
+        @if(auth()->check() && auth()->user()->is_admin)
+            <a href="/admin" class="mobile-nav-item text-danger">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Admin</span>
+            </a>
+        @endif
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

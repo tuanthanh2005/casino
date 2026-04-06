@@ -71,7 +71,7 @@ Route::post('profile', [App\Http\Controllers\ProfileController::class, 'update']
 | Administrative Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('posts', AdminPostController::class);
     Route::resource('categories', AdminCategoryController::class);

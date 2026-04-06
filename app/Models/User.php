@@ -29,4 +29,27 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Check if user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        // 1. Check if email matches the master admin in .env
+        $masterAdmin = env('ADMIN_EMAIL');
+        if ($masterAdmin && $this->email === $masterAdmin) {
+            return true;
+        }
+
+        // 2. Fallback to database 'role' or 'is_admin' column
+        return (isset($this->role) && $this->role === 'admin') || (isset($this->is_admin) && $this->is_admin);
+    }
+
+    /**
+     * Attribute for Blade: $user->is_admin
+     */
+    public function getIsAdminAttribute(): bool
+    {
+        return $this->isAdmin();
+    }
 }
