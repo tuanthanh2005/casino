@@ -16,9 +16,11 @@
                 </h1>
 
                 <!-- Ad Slot: Top Banner (BANNER NGANG - SAU TIÊU ĐỀ) -->
+                @if(\App\Models\Setting::get('adsense_enabled', '0') == '1')
                 <div class="ad-slot my-4 text-center" style="min-height: 90px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em;">
                     {{ __('Advertisement') }}
                 </div>
+                @endif
 
                 <div class="d-flex align-items-center justify-content-center gap-3 py-4 border-top border-bottom"
                     style="border-color: rgba(15, 23, 42, 0.05) !important;">
@@ -55,9 +57,11 @@
             </div>
 
             <!-- Ad Slot: Middle (SQUARE/RECTANGLE - SAU MỤC LỤC) -->
+            @if(\App\Models\Setting::get('adsense_enabled', '0') == '1')
             <div class="ad-slot mb-5 text-center" style="min-height: 250px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em;">
                 {{ __('Advertisement') }}
             </div>
+            @endif
 
             <div id="content-body" class="prose"
                 style="font-size: 1.25rem; line-height: 1.85; color: #334155; font-family: var(--font-body); letter-spacing: -0.01em;">
