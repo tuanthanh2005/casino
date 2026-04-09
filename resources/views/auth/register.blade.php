@@ -56,7 +56,7 @@
 
             <div class="mb-4 form-check">
                 <input type="checkbox" name="terms" class="form-check-input" id="terms" required>
-                <label class="form-check-label small opacity-75" for="terms">{{ __('I agree to the') }} <a href="/terms" class="text-primary text-decoration-none fw-bold">{{ __('Terms of Service') }}</a> & <a href="/privacy" class="text-primary text-decoration-none fw-bold">{{ __('Privacy Policy') }}</a></label>
+                <label class="form-check-label small opacity-75" for="terms">{{ __('I agree to the') }} <a href="/page/terms" target="_blank" class="text-primary text-decoration-none fw-bold">{{ __('Terms of Service') }}</a> & <a href="/page/privacy" target="_blank" class="text-primary text-decoration-none fw-bold">{{ __('Privacy Policy') }}</a></label>
             </div>
 
             <button type="submit" class="btn btn-primary w-100 py-3 mb-4" style="border-radius: 12px; font-weight: 700;">{{ __('Create Free Account') }}</button>

@@ -31,15 +31,16 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-// Legal & Static
+// Newsletter
+Route::get('/newsletter', [\App\Http\Controllers\SubscriberController::class, 'index'])->name('newsletter');
+Route::post('/newsletter/subscribe', [\App\Http\Controllers\SubscriberController::class, 'subscribe'])->name('newsletter.subscribe');
+
+// Static & Dynamic Pages
 Route::view('/about', 'pages.about')->name('about');
 Route::view('/contact', 'pages.contact')->name('contact');
-Route::prefix('legal')->name('legal.')->group(function () {
-    Route::view('/privacy', 'pages.legal.privacy')->name('privacy');
-    Route::view('/disclaimer', 'pages.legal.disclaimer')->name('disclaimer');
-    Route::view('/affiliate-disclosure', 'pages.legal.affiliate-disclosure')->name('affiliate');
-    Route::view('/terms', 'pages.legal.terms')->name('terms');
-});
+
+// Dynamic Pages
+Route::get('/page/{slug}', [\App\Http\Controllers\PageController::class, 'show'])->name('page.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -76,6 +77,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('posts', AdminPostController::class);
     Route::resource('categories', AdminCategoryController::class);
     Route::resource('tags', AdminTagController::class);
+    Route::resource('pages', \App\Http\Controllers\Admin\PageController::class);
 
     // Country Management (Flags/Icons)
     Route::resource('countries', \App\Http\Controllers\Admin\CountryController::class);

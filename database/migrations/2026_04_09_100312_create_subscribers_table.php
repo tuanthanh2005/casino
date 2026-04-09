@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('users', 'role')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->string('role')->default('user')->after('email');
-            });
-        }
+        Schema::create('subscribers', function (Blueprint $table) {
+            $table->id();
+            $table->string('email')->unique();
+            $table->string('status')->default('active'); // active, unsubscribed
+            $table->timestamps();
+        });
     }
 
     /**
@@ -23,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
-        });
+        Schema::dropIfExists('subscribers');
     }
 };

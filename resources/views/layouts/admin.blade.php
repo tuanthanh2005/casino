@@ -109,6 +109,7 @@
             <a href="{{ route('admin.countries.index') }}" class="nav-item-admin {{ request()->is('admin/countries*') ? 'active' : '' }}">{{ __('Countries Management') }}</a>
             <a href="/admin/categories" class="nav-item-admin {{ request()->is('admin/categories*') ? 'active' : '' }}">{{ __('Category Management') }}</a>
             <a href="/admin/tags" class="nav-item-admin {{ request()->is('admin/tags*') ? 'active' : '' }}">{{ __('Tags') }}</a>
+            <a href="{{ route('admin.pages.index') }}" class="nav-item-admin {{ request()->is('admin/pages*') ? 'active' : '' }}">{{ __('Static Pages') }}</a>
             <div style="margin: 2rem 1rem 1rem; font-size: 0.75rem; text-transform: uppercase; color: #475569; letter-spacing: 0.1em;">{{ __('External') }}</div>
             <a href="/" target="_blank" class="nav-item-admin">{{ __('Visit Website') }}</a>
             <a href="/logout" class="nav-item-admin" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="color: #fca5a5;">{{ __('Log Out') }}</a>
