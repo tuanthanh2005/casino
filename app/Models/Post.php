@@ -57,7 +57,6 @@ class Post extends Model
 
     public function renderContent(): string
     {
-        $parsedown = new \Parsedown();
-        return $parsedown->text($this->content);
+        return \Illuminate\Support\Str::markdown((string) $this->content);
     }
 }
