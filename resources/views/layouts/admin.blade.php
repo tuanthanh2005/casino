@@ -105,6 +105,7 @@
                 @endif
             </a>
             <a href="{{ route('admin.settings.footer') }}" class="nav-item-admin {{ request()->is('admin/settings/footer*') ? 'active' : '' }}">{{ __('Footer Settings') }}</a>
+            <a href="{{ route('admin.settings.adsense') }}" class="nav-item-admin {{ request()->is('admin/settings/adsense*') ? 'active' : '' }}">{{ __('Quảng cáo Adsense') }}</a>
             <a href="{{ route('admin.countries.index') }}" class="nav-item-admin {{ request()->is('admin/countries*') ? 'active' : '' }}">{{ __('Countries Management') }}</a>
             <a href="/admin/categories" class="nav-item-admin {{ request()->is('admin/categories*') ? 'active' : '' }}">{{ __('Category Management') }}</a>
             <a href="/admin/tags" class="nav-item-admin {{ request()->is('admin/tags*') ? 'active' : '' }}">{{ __('Tags') }}</a>

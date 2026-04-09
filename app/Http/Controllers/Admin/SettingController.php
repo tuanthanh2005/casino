@@ -24,4 +24,21 @@ class SettingController extends Controller
 
         return back()->with('success', 'Footer settings updated successfully.');
     }
+
+    public function adsense()
+    {
+        $settings = Setting::where('group', 'adsense')->pluck('value', 'key');
+        return view('admin.settings.adsense', compact('settings'));
+    }
+
+    public function updateAdsense(Request $request)
+    {
+        $data = $request->only(['adsense_enabled', 'adsense_code']);
+        
+        // Handle checkbox
+        Setting::set('adsense_enabled', $request->has('adsense_enabled') ? '1' : '0', 'adsense');
+        Setting::set('adsense_code', $data['adsense_code'] ?? '', 'adsense');
+
+        return back()->with('success', 'Cập nhật cài đặt Adsense thành công.');
+    }
 }

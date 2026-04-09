@@ -88,6 +88,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Site Settings (Footer)
     Route::get('/settings/footer', [\App\Http\Controllers\Admin\SettingController::class, 'footer'])->name('settings.footer');
     Route::post('/settings/footer', [\App\Http\Controllers\Admin\SettingController::class, 'updateFooter']);
+
+    // Adsense Settings
+    Route::get('/settings/adsense', [\App\Http\Controllers\Admin\SettingController::class, 'adsense'])->name('settings.adsense');
+    Route::post('/settings/adsense', [\App\Http\Controllers\Admin\SettingController::class, 'updateAdsense']);
 });
 
 /*

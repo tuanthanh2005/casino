@@ -17,8 +17,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/mobile.css') }}">
-    <!-- Google AdSense - dán mã script của Google vào đây sau này -->
-    {{-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> --}}
+    <!-- Google AdSense -->
+    @php
+        $adsenseEnabled = \App\Models\Setting::get('adsense_enabled', '0');
+        $adsenseCode = \App\Models\Setting::get('adsense_code', '');
+    @endphp
+    @if($adsenseEnabled == '1' && !empty($adsenseCode))
+        {!! $adsenseCode !!}
+    @endif
 
     @stack('styles')
 </head>
