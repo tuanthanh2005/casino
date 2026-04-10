@@ -86,6 +86,55 @@
         }
     </style>
     @stack('styles')
+    <style>
+        /* ============================================================
+           GLOBAL ADMIN TOAST
+           ============================================================ */
+        .admin-toast-container {
+            position: fixed; top: 1.5rem; right: 1.5rem;
+            z-index: 9999; display: flex; flex-direction: column; gap: .75rem;
+            pointer-events: none;
+        }
+        .admin-toast {
+            display: flex; align-items: flex-start; gap: .875rem;
+            padding: 1rem 1.25rem; border-radius: 12px;
+            min-width: 300px; max-width: 420px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.12), 0 4px 10px rgba(0,0,0,.08);
+            pointer-events: all;
+            animation: admin-toast-in .4s cubic-bezier(.22,1,.36,1);
+        }
+        @keyframes admin-toast-in {
+            from { opacity: 0; transform: translateX(60px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .admin-toast.out {
+            animation: admin-toast-out .3s ease forwards;
+        }
+        @keyframes admin-toast-out {
+            to { opacity: 0; transform: translateX(60px); }
+        }
+        .admin-toast-success { background: #fff; border-left: 4px solid #22c55e; }
+        .admin-toast-error   { background: #fff; border-left: 4px solid #ef4444; }
+        .admin-toast-icon { flex-shrink: 0; margin-top: 1px; }
+        .admin-toast-success .admin-toast-icon { color: #22c55e; }
+        .admin-toast-error   .admin-toast-icon { color: #ef4444; }
+        .admin-toast-body { flex: 1; }
+        .admin-toast-title { font-size: .8125rem; font-weight: 700; color: #0f172a; margin: 0 0 .15rem; }
+        .admin-toast-msg   { font-size: .8125rem; color: #475569; margin: 0; }
+        .admin-toast-progress {
+            position: absolute; bottom: 0; left: 0; height: 3px; border-radius: 0 0 12px 12px;
+            width: 100%; transform-origin: left;
+        }
+        .admin-toast { position: relative; overflow: hidden; }
+        .admin-toast-success .admin-toast-progress { background: #22c55e; }
+        .admin-toast-error   .admin-toast-progress { background: #ef4444; }
+        .admin-toast-close {
+            flex-shrink: 0; background: none; border: none; cursor: pointer;
+            color: #94a3b8; display: flex; align-items: center; transition: color .2s;
+            padding: 0;
+        }
+        .admin-toast-close:hover { color: #0f172a; }
+    </style>
 </head>
 
 <body>
@@ -129,11 +178,54 @@
             </div>
         </header>
 
-        @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 2rem; border-radius: 12px; border: none; background: #dcfce7; color: #166534;">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        @if(session('success') || session('error'))
+        <div class="admin-toast-container" id="admin-toast-container">
+            @if(session('success'))
+            <div class="admin-toast admin-toast-success" id="toast-success">
+                <div class="admin-toast-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div class="admin-toast-body">
+                    <p class="admin-toast-title">{{ __('Thành công!') }}</p>
+                    <p class="admin-toast-msg">{{ session('success') }}</p>
+                </div>
+                <button class="admin-toast-close" onclick="closeToast('toast-success')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <div class="admin-toast-progress" id="toast-success-bar" style="animation: toast-shrink 5s linear forwards;"></div>
+            </div>
+            @endif
+            @if(session('error'))
+            <div class="admin-toast admin-toast-error" id="toast-error">
+                <div class="admin-toast-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div class="admin-toast-body">
+                    <p class="admin-toast-title">{{ __('Có lỗi xảy ra!') }}</p>
+                    <p class="admin-toast-msg">{{ session('error') }}</p>
+                </div>
+                <button class="admin-toast-close" onclick="closeToast('toast-error')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <div class="admin-toast-progress" id="toast-error-bar" style="animation: toast-shrink 7s linear forwards;"></div>
+            </div>
+            @endif
         </div>
+        <style>
+            @keyframes toast-shrink { from { width: 100%; } to { width: 0%; } }
+        </style>
+        <script>
+            function closeToast(id) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.classList.add('out');
+                setTimeout(() => el.remove(), 300);
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(() => closeToast('toast-success'), 5000);
+                setTimeout(() => closeToast('toast-error'), 7000);
+            });
+        <\/script>
         @endif
 
         @yield('admin_content')
