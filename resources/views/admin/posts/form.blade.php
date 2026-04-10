@@ -123,7 +123,7 @@
 <style>
     .ck-editor__editable_inline {
         min-height: 400px;
-        max-height: 800px;
+        max-height: 500px;
         overflow-y: auto !important;
         font-family: 'Inter', sans-serif !important;
         font-size: 1rem !important;
