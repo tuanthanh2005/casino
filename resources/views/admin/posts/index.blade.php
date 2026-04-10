@@ -17,13 +17,21 @@
                     <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                 @endforeach
             </select>
+            <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8125rem;">Filter</button>
         </form>
+        <div>
+            <button type="button" id="btnBulkDelete" class="btn" style="padding: 0.5rem 1.25rem; font-size: 0.8125rem; background: #ef4444; color: white; border: none; border-radius: 6px;">Delete Selected</button>
+        </div>
     </div>
+    
     <div style="overflow-x: auto;">
-        <table class="table" style="margin-top: 0;">
+        <table class="table" style="margin-top: 0; width: 100%;">
             <thead>
                 <tr>
-                    <th style="padding-left: 2rem;">Lang</th>
+                    <th style="padding-left: 2rem; width: 40px;">
+                        <input type="checkbox" id="selectAll" style="cursor: pointer;">
+                    </th>
+                    <th>Lang</th>
                     <th>Title</th>
                     <th>Category</th>
                     <th>Status</th>
@@ -36,6 +44,9 @@
                 @foreach($posts as $post)
                 <tr>
                     <td style="padding-left: 2rem;">
+                        <input type="checkbox" value="{{ $post->id }}" class="post-checkbox" style="cursor: pointer;">
+                    </td>
+                    <td>
                         <span class="badge {{ $post->lang == 'en' ? 'bg-primary' : 'bg-danger' }}" style="font-size: 0.65rem;">
                             {{ strtoupper($post->lang) }}
                         </span>
@@ -55,11 +66,7 @@
                     <td style="padding-right: 2rem; text-align: right;">
                         <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
                             <a href="/admin/posts/{{ $post->id }}/edit" class="btn" style="padding: 0.4rem 0.6rem; font-size: 0.75rem; background: #f1f5f9; color: #475569;">Edit</a>
-                            <form action="/admin/posts/{{ $post->id }}" method="POST" onsubmit="return confirm('Are you sure?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn" style="padding: 0.4rem 0.6rem; font-size: 0.75rem; background: #fee2e2; color: #991b1b;">Delete</button>
-                            </form>
+                            <button type="button" onclick="if(confirm('Are you sure?')) { document.getElementById('singleDeleteForm').action = '/admin/posts/{{ $post->id }}'; document.getElementById('singleDeleteForm').submit(); }" class="btn" style="padding: 0.4rem 0.6rem; font-size: 0.75rem; background: #fee2e2; color: #991b1b; border: none;">Delete</button>
                             <a href="/blog/{{ $post->slug }}" target="_blank" class="btn" style="padding: 0.4rem 0.6rem; font-size: 0.75rem; background: #e0f2fe; color: #0369a1;">Live</a>
                         </div>
                     </td>
@@ -68,8 +75,52 @@
             </tbody>
         </table>
     </div>
+    
     <div style="padding: 2rem; border-top: 1px solid #f1f5f9; background: #f8fafc;">
         {{ $posts->links() }}
     </div>
 </div>
+
+<form id="singleDeleteForm" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
+<form id="bulkDeleteForm" action="{{ route('admin.posts.bulkDelete') }}" method="POST" style="display: none;">
+    @csrf
+    <div id="bulkDeleteInputs"></div>
+</form>
+
+<script>
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.post-checkbox');
+        checkboxes.forEach(cb => {
+            cb.checked = this.checked;
+        });
+    });
+
+    document.getElementById('btnBulkDelete').addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.post-checkbox:checked');
+        if (checkboxes.length === 0) {
+            alert('Please select at least one post to delete.');
+            return;
+        }
+
+        if (confirm('Are you sure you want to delete the selected posts?')) {
+            const form = document.getElementById('bulkDeleteForm');
+            const inputsDiv = document.getElementById('bulkDeleteInputs');
+            inputsDiv.innerHTML = ''; // Clear previous
+
+            checkboxes.forEach(cb => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'ids[]';
+                input.value = cb.value;
+                inputsDiv.appendChild(input);
+            });
+
+            form.submit();
+        }
+    });
+</script>
 @endsection

@@ -14,7 +14,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('category', 'author')->latest()->paginate(20);
+        $posts = Post::with('category', 'author')->latest()->paginate(10);
         return view('admin.posts.index', compact('posts'));
     }
 
@@ -126,5 +126,24 @@ class PostController extends Controller
         }
         $post->delete();
         return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully.');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:posts,id'
+        ]);
+
+        $posts = Post::whereIn('id', $request->ids)->get();
+
+        foreach ($posts as $post) {
+            if ($post->featured_image && Storage::disk('public_uploads')->exists('uploads/posts/' . $post->featured_image)) {
+                Storage::disk('public_uploads')->delete('uploads/posts/' . $post->featured_image);
+            }
+            $post->delete();
+        }
+
+        return redirect()->route('admin.posts.index')->with('success', 'Selected posts deleted successfully.');
     }
 }

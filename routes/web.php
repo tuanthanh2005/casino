@@ -74,6 +74,7 @@ Route::post('profile', [App\Http\Controllers\ProfileController::class, 'update']
 */
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('posts/bulk-delete', [AdminPostController::class, 'bulkDelete'])->name('posts.bulkDelete');
     Route::resource('posts', AdminPostController::class);
     Route::resource('categories', AdminCategoryController::class);
     Route::resource('tags', AdminTagController::class);
