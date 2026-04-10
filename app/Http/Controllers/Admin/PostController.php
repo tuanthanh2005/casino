@@ -60,13 +60,7 @@ class PostController extends Controller
 
         $post = Post::create($validated);
 
-        if ($request->filled('tags_input')) {
-            $tagIds = explode(',', $request->tags_input);
-            $tagIds = array_map('trim', $tagIds);
-            $post->tags()->sync($tagIds);
-        } elseif ($request->has('tags')) {
-            $post->tags()->sync($request->tags);
-        }
+        $post->tags()->sync($this->resolveTagIds($request->tags_input ?? ''));
 
         return redirect()->route('admin.posts.index')->with('success', 'Post created successfully.');
     }
@@ -110,11 +104,7 @@ class PostController extends Controller
 
         $post->update($validated);
 
-        if ($request->has('tags')) {
-            $post->tags()->sync($request->tags);
-        } else {
-            $post->tags()->detach();
-        }
+        $post->tags()->sync($this->resolveTagIds($request->tags_input ?? ''));
 
         return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully.');
     }
@@ -145,5 +135,46 @@ class PostController extends Controller
         }
 
         return redirect()->route('admin.posts.index')->with('success', 'Selected posts deleted successfully.');
+    }
+
+    /**
+     * Resolve a comma-separated string of tag IDs or tag names into an array of valid integer IDs.
+     * Entries that are numeric are used directly (after verifying they exist).
+     * Entries that are not numeric are looked up by tag name.
+     * Unresolvable entries are silently ignored.
+     */
+    private function resolveTagIds(string $input): array
+    {
+        if (trim($input) === '') {
+            return [];
+        }
+
+        $parts = array_filter(array_map('trim', explode(',', $input)));
+
+        $numericIds = [];
+        $names      = [];
+
+        foreach ($parts as $part) {
+            if (ctype_digit($part)) {
+                $numericIds[] = (int) $part;
+            } else {
+                $names[] = $part;
+            }
+        }
+
+        $resolvedIds = [];
+
+        // Validate numeric IDs actually exist
+        if (!empty($numericIds)) {
+            $resolvedIds = Tag::whereIn('id', $numericIds)->pluck('id')->toArray();
+        }
+
+        // Look up by name for text entries
+        if (!empty($names)) {
+            $byName = Tag::whereIn('name', $names)->pluck('id')->toArray();
+            $resolvedIds = array_merge($resolvedIds, $byName);
+        }
+
+        return array_unique($resolvedIds);
     }
 }
