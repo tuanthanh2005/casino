@@ -1,5 +1,6 @@
 @extends('layouts.app')
-@section('title', __('Home') . ' - Aquahub.pro')
+@section('title', app()->getLocale() == 'vi' ? 'Aquahub.pro - Xây Dựng Bể Cá Cho Người Mới' : __('Aquarium Guides for Beginners') . ' - Aquahub.pro')
+@section('meta_description', app()->getLocale() == 'vi' ? 'Khám phá các bài viết hướng dẫn chi tiết, tư vấn thiết lập và cách chăm sóc bể cá thủy sinh dành cho người mới bắt đầu tại Aquahub.pro.' : __('Step-by-step guides, fish care tutorials, and setup advice to help you build a stunning underwater world without the stress.'))
 
 @section('content')
 <div class="hero">
