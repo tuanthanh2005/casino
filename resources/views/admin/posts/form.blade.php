@@ -122,9 +122,8 @@
 @push('styles')
 <style>
     .ck-editor__editable_inline {
-        min-height: 400px;
-        max-height: 500px;
-        overflow-y: auto !important;
+        min-height: 500px;
+        height: auto !important; /* Allow it to stretch infinitely downwards */
         font-family: 'Inter', sans-serif !important;
         font-size: 1rem !important;
         line-height: 1.6 !important;
