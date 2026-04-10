@@ -121,12 +121,14 @@
 
 @push('styles')
 <style>
+    /* Base Editor Container */
     .ck-editor__editable_inline {
         min-height: 500px;
-        height: auto !important; /* Allow it to stretch infinitely downwards */
+        height: auto !important; 
         font-family: 'Inter', sans-serif !important;
-        font-size: 1rem !important;
-        line-height: 1.6 !important;
+        font-size: 1.05rem !important; 
+        line-height: 1.7 !important;
+        color: #334155 !important; 
     }
     .ck.ck-editor__main>.ck-editor__editable {
         background: #fff !important;
@@ -137,11 +139,72 @@
         background: #f8fafc !important;
         border: 1px solid #e2e8f0 !important;
         border-radius: 8px 8px 0 0 !important;
+        padding: 0.5rem !important;
     }
     .ck.ck-content {
         border: 1px solid #e2e8f0 !important;
         border-top: none !important;
         border-radius: 0 0 8px 8px !important;
+        padding: 2.5rem !important; 
+    }
+
+    /* Inner Content Styling for Editor (Typography) */
+    .ck-content h1, .ck-content h2, .ck-content h3, .ck-content h4 {
+        color: #0f172a;
+        font-weight: 700;
+        margin-top: 1.5em;
+        margin-bottom: 0.75em;
+        line-height: 1.3;
+    }
+    .ck-content h1 { font-size: 1.875rem; }
+    .ck-content h2 { font-size: 1.5rem; }
+    .ck-content h3 { font-size: 1.25rem; }
+    
+    .ck-content p {
+        margin-bottom: 1.25em;
+    }
+    
+    .ck-content ul, .ck-content ol {
+        margin-bottom: 1.25em;
+        padding-left: 1.5rem;
+    }
+    
+    .ck-content li {
+        margin-bottom: 0.5em;
+    }
+    
+    .ck-content blockquote {
+        border-left: 4px solid #94a3b8;
+        margin: 1.5em 0;
+        font-style: italic;
+        color: #475569;
+        background: #f8fafc;
+        padding: 1rem 1.5rem;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .ck-content a {
+        color: #0284c7;
+        text-decoration: underline;
+    }
+    
+    .ck-content strong {
+        font-weight: 700;
+        color: #1e293b;
+    }
+    
+    .ck-content .table {
+        margin-bottom: 1.5em;
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .ck-content .table td, .ck-content .table th {
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem;
+    }
+    .ck-content .table th {
+        background: #f8fafc;
+        font-weight: 600;
     }
 </style>
 @endpush
